@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { CaseStudy, SelectedWork } from '@/types/database';
 import { isVideoUrl } from '@/lib/utils';
-import { Plus, Trash, UploadSimple, Eye, EyeSlash, ArrowsVertical, Pencil, FloppyDisk, X } from '@phosphor-icons/react';
+import { Plus, Trash, UploadSimple, Eye, EyeSlash, ArrowsVertical, Pencil, FloppyDisk } from '@phosphor-icons/react';
 
 interface EditForm {
     title: string;
@@ -74,6 +74,7 @@ export default function SelectedWorksAdmin() {
                 image_url = publicUrl;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error } = await (supabase as any).from('selected_works').insert([{
                 ...newItem,
                 case_study_id: newItem.case_study_id || null,
@@ -99,16 +100,19 @@ export default function SelectedWorksAdmin() {
 
     // --- Inline quick-toggle handlers (used when NOT in edit mode) ---
     const handleToggleOverlay = async (id: string, current: boolean) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase as any).from('selected_works').update({ show_hover_overlay: !current }).eq('id', id);
         fetchAll();
     };
 
     const handleWidthChange = async (id: string, width: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase as any).from('selected_works').update({ display_width: width }).eq('id', id);
         fetchAll();
     };
 
     const handleSortChange = async (id: string, sort: number) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase as any).from('selected_works').update({ sort_order: sort }).eq('id', id);
         fetchAll();
     };
@@ -153,6 +157,7 @@ export default function SelectedWorksAdmin() {
                 image_url = publicUrl;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updateData: Record<string, any> = {
                 title: editForm.title,
                 category: editForm.category,
@@ -166,6 +171,7 @@ export default function SelectedWorksAdmin() {
                 updateData.image_url = image_url;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error } = await (supabase as any).from('selected_works').update(updateData).eq('id', id);
             if (error) { alert('Save error: ' + error.message); setIsSaving(false); return; }
 

@@ -10,10 +10,6 @@ export default function AdminDashboard() {
     const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        fetchCaseStudies();
-    }, []);
-
     const fetchCaseStudies = async () => {
         setIsLoading(true);
         const { data, error } = await supabase
@@ -26,6 +22,10 @@ export default function AdminDashboard() {
         }
         setIsLoading(false);
     };
+
+    useEffect(() => {
+        fetchCaseStudies();
+    }, []);
 
     const handleDelete = async (id: string) => {
         if (confirm('Are you sure you want to delete this case study?')) {
@@ -58,12 +58,14 @@ export default function AdminDashboard() {
         setCaseStudies(newCases);
 
         // Background sync
-        await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any)
             .from('case_studies')
             .update({ created_at: targetCreatedAt })
             .eq('id', currentStudy.id);
         
-        await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any)
             .from('case_studies')
             .update({ created_at: currentCreatedAt })
             .eq('id', targetStudy.id);

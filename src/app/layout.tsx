@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Outfit, Cormorant_Garamond, Playfair_Display } from 'next/font/google';
 import './globals.css';
+import { Suspense } from 'react';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
 import CookieBanner from '@/components/layout/CookieBanner';
 
@@ -65,7 +66,9 @@ export default function RootLayout({
       >
         <div className="noise-overlay"></div>
         {children}
-        <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         <CookieBanner />
       </body>
     </html>

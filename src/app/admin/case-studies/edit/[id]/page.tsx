@@ -97,8 +97,10 @@ export default function EditCaseStudy() {
             setExistingLogoUrl(study.logo_url || '');
 
             // Parse badges
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const badges = study.badges as any[];
             if (badges && badges.length > 0) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 setBadgesRaw(badges.map((b: any) => b.text).join(', '));
             }
 
@@ -226,6 +228,7 @@ export default function EditCaseStudy() {
             const badges = badgesRaw.split(',').map(b => ({ icon: 'Browser', text: b.trim() }));
             const scope_of_work = scopeRaw.split(',').map(s => s.trim()).filter(Boolean);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error } = await (supabase as any).from('case_studies').update({
                 ...formData,
                 image_url,
@@ -241,6 +244,7 @@ export default function EditCaseStudy() {
             }
 
             router.push('/admin');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Update error:', error?.message || JSON.stringify(error));
         } finally {

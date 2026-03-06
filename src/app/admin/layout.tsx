@@ -8,6 +8,7 @@ import { SignOut, Briefcase, Plus, Images, CalendarBlank } from '@phosphor-icons
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [session, setSession] = useState<any>(null);
     const router = useRouter();
     const pathname = usePathname();

@@ -15,6 +15,10 @@ export interface RichContentBlock {
 
 export interface Database {
     public: {
+        Views: { [key: string]: { Row: Record<string, unknown> } }
+        Functions: { [key: string]: unknown }
+        Enums: { [key: string]: unknown }
+        CompositeTypes: { [key: string]: unknown }
         Tables: {
             case_studies: {
                 Row: {

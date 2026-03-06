@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { CaseStudyInsert, RichContentBlock } from '@/types/database';
-import { UploadSimple, CaretLeft, Plus, Trash, TextH, TextT, Image as ImageIcon, ArrowUp, ArrowDown, VideoCamera, TextB, TextItalic, LinkSimple, ListBullets, ListNumbers, Quotes } from '@phosphor-icons/react';
+import { UploadSimple, CaretLeft, Trash, TextH, TextT, Image as ImageIcon, ArrowUp, ArrowDown, VideoCamera, TextB, TextItalic, LinkSimple, ListBullets, ListNumbers, Quotes } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function NewCaseStudy() {
@@ -184,6 +184,7 @@ export default function NewCaseStudy() {
             const scope_of_work = scopeRaw.split(',').map(s => s.trim()).filter(Boolean);
 
             // 5. Insert into Database
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error } = await (supabase as any).from('case_studies').insert([{
                 ...formData as CaseStudyInsert,
                 image_url,
@@ -198,6 +199,7 @@ export default function NewCaseStudy() {
             }
 
             router.push('/admin');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Submission error:', error?.message || JSON.stringify(error));
             setSubmitError(error?.message || 'An unexpected error occurred. Please try again.');

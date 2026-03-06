@@ -108,7 +108,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
                                         : level === 3
                                         ? "font-sans font-bold text-2xl md:text-3xl text-ink tracking-tight leading-tight"
                                         : "font-sans font-semibold text-xl md:text-2xl text-ink tracking-tight leading-tight";
-                                    const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+                                    const Tag = `h${level}` as 'h2' | 'h3' | 'h4';
                                     return <Tag className={className}>{block.value}</Tag>;
                                 })()}
                                 {block.type === 'text' && (
