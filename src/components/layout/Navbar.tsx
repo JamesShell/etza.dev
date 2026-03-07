@@ -80,10 +80,10 @@ export function Navbar() {
     const dark = isScrolled && isOverDark;
 
     return (
-        <header ref={navRef} className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 w-full">
+        <header ref={navRef} className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
             <nav
                 className={cn(
-                    'flex items-center justify-between rounded-full px-8 py-4 transition-all duration-500 ease-in-out',
+                    'flex items-center justify-between rounded-full px-4 md:px-8 py-3 md:py-4 transition-all duration-500 ease-in-out max-w-[95vw] md:max-w-none',
                     isScrolled
                         ? dark
                             ? 'backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/10 ring-1 ring-white/5'
@@ -98,13 +98,13 @@ export function Navbar() {
                         : 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.45) 100%)',
                 } : undefined}
             >
-                <div className="mr-10 flex items-center">
-                    <Link href="/" className={cn("nav-item flex items-center gap-2 text-xl font-sans font-bold tracking-tighter mr-5 transition-colors duration-500", dark ? 'text-white' : 'text-ink')}>
-                        <BlinkingSmiley size={40} />
+                <div className="flex items-center md:mr-10">
+                    <Link href="/" className={cn("nav-item flex items-center gap-2 text-xl font-sans font-bold tracking-tighter transition-colors duration-500", dark ? 'text-white' : 'text-ink')}>
+                        <BlinkingSmiley size={32} />
                     </Link>
                 </div>
 
-                <ul className="hidden md:flex items-center gap-10 mr-10">
+                <ul className="hidden md:flex items-center gap-10 md:mr-10">
                     {navLinks.map((link) => (
                         <li key={link.label} className="nav-item">
                             <Link
@@ -140,10 +140,10 @@ export function Navbar() {
                         <Button
                             variant={dark ? 'outline' : isScrolled ? 'primary' : 'outline'}
                             className={cn(
-                                "px-8 py-3 !text-sm whitespace-nowrap transition-colors duration-500",
+                                "max-md:px-4 max-md:py-2 px-8 py-3 !text-sm whitespace-nowrap transition-colors duration-500",
                                 dark
                                     ? "border-white/40 text-white hover:bg-white hover:text-ink"
-                                    : !isScrolled && "border-white/40 text-white hover:bg-white hover:text-ink"
+                                    : !isScrolled ? "border-white/40 text-white hover:bg-white hover:text-ink" : ""
                             )}
                         >
                             Book a Call
