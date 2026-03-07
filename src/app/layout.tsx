@@ -30,16 +30,16 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Ettouzany | Premium Web Design & Development for Agencies',
-  description: 'Web Developer & Designer with 4+ years of experience crafting high-performance, conversion-driven websites for agencies and ambitious brands.',
-  keywords: ['Web Developer', 'Web Designer', 'Freelance Web Developer', 'Agency Web Development', 'React Developer', 'Ettouzany', 'Creative Developer'],
+  title: 'Ettouzany | High-Performance Web Development & Design',
+  description: 'Senior Web Developer & Designer. Providing conversion-focused website redesigns for growing brands and reliable white-label web development for agencies.',
+  keywords: ['Web Developer', 'Web Designer', 'Freelance Web Developer for Agencies', 'White Label Web Development', 'Custom Website Redesign', 'React Developer', 'Ettouzany', 'Next.js Developer', 'Creative Developer'],
   authors: [{ name: 'Ettouzany' }],
   creator: 'Ettouzany',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    title: 'Ettouzany | Premium Web Design & Development',
-    description: 'Web Developer & Designer with 4+ years of experience crafting high-performance websites for agencies and ambitious brands.',
+    title: 'Ettouzany | High-Performance Web Development & Design',
+    description: 'Senior Web Developer & Designer. Providing conversion-focused website redesigns for growing brands and reliable white-label web development for agencies.',
     siteName: 'Ettouzany',
   },
   icons: {

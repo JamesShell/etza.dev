@@ -111,7 +111,7 @@ export function Hero() {
 
                     {/* Subheadline */}
                     <motion.p
-                        className="text-sm sm:text-base lg:text-xl text-zinc-500 leading-relaxed max-w-xl mb-6 sm:mb-8"
+                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-zinc-500 leading-relaxed max-w-2xl mb-6 sm:mb-8"
                         variants={item}
                     >
                         Design & engineering for agencies who'd rather deliver results than wrestle with their own website.
@@ -121,7 +121,7 @@ export function Hero() {
                     <motion.div className="flex flex-row gap-3 sm:gap-4 items-center sm:items-start flex-wrap" variants={item}>
                         <Button
                             variant="primary"
-                            className="font-semibold text-[14px] sm:text-[17px] flex items-center justify-center transition-all duration-300 shadow-xl shadow-black/10 px-4 sm:px-8 py-2.5 sm:py-4"
+                            className="font-semibold text-[14px] sm:text-[17px] flex items-center justify-center transition-all duration-300 shadow-xl shadow-black/10 px-6 sm:px-8 py-3 sm:py-4"
                             onClick={scrollToWork}
                             onMouseEnter={() => setHoveredOne("about")}
                             onMouseLeave={() => setHoveredOne("")}
@@ -138,7 +138,7 @@ export function Hero() {
                         >
                             <Button
                                 variant="secondary"
-                                className="bg-transparent border border-zinc-300 text-black font-semibold text-[14px] sm:text-[17px] hover:bg-zinc-100/50 transition-all duration-300 px-4 sm:px-8 py-2.5 sm:py-4"
+                                className="bg-transparent border border-zinc-300 text-black font-semibold text-[14px] sm:text-[17px] hover:bg-zinc-100/50 transition-all duration-300 px-6 sm:px-8 py-3 sm:py-4"
                                 onMouseEnter={() => setHoveredOne("about")}
                                 onMouseLeave={() => setHoveredOne("")}
                             >
@@ -197,7 +197,7 @@ export function Hero() {
                                 className="w-[30px] h-[30px] scale-[1.15]"
                             />
                         </div>
-                        <span className="font-sans font-medium text-[16px] tracking-tight leading-none mb-[2px]">Rated 5 stars on Contra</span>
+                        <span className="font-sans font-medium text-[14px] sm:text-[16px] tracking-tight leading-none mb-[2px]">Rated 5 stars on Contra</span>
                     </a>
                 </motion.div>
                 <motion.div

@@ -28,12 +28,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 
     return {
-        title: `${study.title} | Case Study by Ettouzany`,
-        description: `Explore how Ettouzany helped ${study.title} achieve their goals. ${study.description.slice(0, 120)}...`,
-        keywords: [study.category, 'Web Design Case Study', 'Web Development Case Study', 'Ettouzany Works', 'Creative Web Solutions'],
+        title: `${study.title} | Web Design & Development Case Study`,
+        description: `Explore my high-performance web development and design process for ${study.title}. ${study.description.slice(0, 110)}...`,
+        keywords: [study.category, 'Web Design Case Study', 'Web Development Case Study', 'Website Redesign', 'Next.js Development', study.title],
         openGraph: {
             title: `${study.title} | Web Design & Development Case Study`,
-            description: `Explore the web development and design process for ${study.title}. ${study.description.slice(0, 120)}...`,
+            description: `Explore my high-performance web development and design process for ${study.title}. ${study.description.slice(0, 110)}...`,
             images: [study.image_url],
             type: 'article',
         }
@@ -80,8 +80,25 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
     // Parse rich content blocks
     const contentBlocks = (study.content as unknown as RichContentBlock[]) || [];
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'CreativeWork',
+        name: `${study.title} | Web Design & Development Case Study`,
+        description: study.description,
+        image: study.image_url,
+        creator: {
+            '@type': 'Person',
+            name: 'Ettouzany Abdelkader'
+        },
+        url: `https://etza.dev/work/${study.slug}`
+    };
+
     return (
         <main className="relative z-10 min-h-screen selection:bg-ink selection:text-white bg-white">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <Navbar />
             <CaseStudyHero
                 title={study.title}
@@ -127,7 +144,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
                                         ) : (
                                             <img
                                                 src={block.value}
-                                                alt={`Content image ${index + 1}`}
+                                                alt={`${study.title} ${study.category} web development case study visual ${index + 1}`}
                                                 className="w-full h-auto rounded-xl shadow-lg border border-zinc-200"
                                             />
                                         )}

@@ -78,7 +78,7 @@ export function FAQ() {
                             className="bg-white rounded-system shadow-sm transform transition-all duration-300 hover:shadow-md"
                         >
                             <button
-                                className="w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none"
+                                className="cursor-pointer w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none"
                                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                                 aria-expanded={openIndex === index}
                             >

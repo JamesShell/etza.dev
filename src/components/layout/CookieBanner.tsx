@@ -29,9 +29,9 @@ const CookieBanner = () => {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
                     transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                    className="fixed bottom-6 left-1/2 -translate-x-1/2 md:bottom-8 md:right-8 md:left-auto md:translate-x-0 z-[100] w-[90vw] md:w-auto max-w-md pointer-events-auto"
+                    className="fixed bottom-6 left-4 right-4 mx-auto md:bottom-8 md:right-8 md:left-auto md:mx-0 z-[100] w-auto max-w-md pointer-events-auto flex justify-center md:block"
                 >
-                    <div className="relative rounded-2xl bg-zinc-900 border border-zinc-800 p-6 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] flex items-center gap-6">
+                    <div className="relative w-full rounded-2xl bg-zinc-900 border border-zinc-800 p-6 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] flex items-center gap-6">
                         <div className="flex-1">
                             <p className="text-zinc-300 text-sm leading-relaxed pr-2">
                                 I use cookies and analytics to understand <br className="hidden md:block" /> how you experience the site.{' '}
