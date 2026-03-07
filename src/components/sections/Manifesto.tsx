@@ -43,7 +43,7 @@ export function Manifesto() {
     }, []);
 
     return (
-        <section id="process" ref={containerRef} className="relative w-full py-32 bg-ink border-t border-zinc-800 overflow-hidden text-white">
+        <section id="process" ref={containerRef} className="relative w-full py-20 md:py-32 bg-ink border-t border-zinc-800 overflow-hidden text-white">
 
             {/* Textured Pattern */}
             <div className="absolute inset-0 z-0 opacity-30 mix-blend-overlay pointer-events-none">
@@ -53,8 +53,8 @@ export function Manifesto() {
 
             <div className="container mx-auto px-6 relative z-10 flex flex-col items-center text-center">
 
-                <div className="max-w-4xl mb-24">
-                    <h2 className="flex flex-col gap-2 md:gap-4 font-sans font-bold text-5xl md:text-7xl lg:text-8xl tracking-tighter leading-[0.9]">
+                <div className="max-w-4xl mb-16 md:mb-24">
+                    <h2 className="flex flex-col gap-2 md:gap-4 font-sans font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tighter leading-[1]">
                         <span className="manifesto-line-1" style={{ WebkitTextStroke: '1px rgba(255, 255, 255, 0.3)', color: 'transparent' }}>
                             Most portfolios show visuals.
                         </span>
@@ -64,12 +64,12 @@ export function Manifesto() {
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto w-full text-left">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 max-w-5xl mx-auto w-full text-left">
 
                     <div className="process-step relative border-l border-zinc-700 pl-6 lg:pl-8 py-2">
                         <div className="absolute top-0 left-[-5px] w-2 h-2 rounded-full bg-blue-primary shadow-[0_0_10px_rgba(30,79,255,0.8)]" />
                         <span className="font-mono text-xs text-zinc-500 tracking-widest uppercase mb-4 block">01</span>
-                        <h3 className="font-serif italic text-3xl text-white mb-3">Strategy + Message</h3>
+                        <h3 className="font-serif italic text-2xl sm:text-3xl text-white mb-3">Strategy + Message</h3>
                         <p className="font-sans text-zinc-400 leading-relaxed text-sm">
                             Before a single pixel is drawn, I establish the conversion hierarchy. Aligning business objectives with user intent through precise positioning.
                         </p>
@@ -78,7 +78,7 @@ export function Manifesto() {
                     <div className="process-step relative border-l border-zinc-700 pl-6 lg:pl-8 py-2">
                         <div className="absolute top-0 left-[-5px] w-2 h-2 rounded-full bg-blue-primary shadow-[0_0_10px_rgba(30,79,255,0.8)]" />
                         <span className="font-mono text-xs text-zinc-500 tracking-widest uppercase mb-4 block">02</span>
-                        <h3 className="font-serif italic text-3xl text-white mb-3">Design System + UI</h3>
+                        <h3 className="font-serif italic text-2xl sm:text-3xl text-white mb-3">Design System + UI</h3>
                         <p className="font-sans text-zinc-400 leading-relaxed text-sm">
                             Crafting a scalable aesthetic that signals premium quality and trust, utilizing micro-interactions to guide the eye.
                         </p>
@@ -87,7 +87,7 @@ export function Manifesto() {
                     <div className="process-step relative border-l border-zinc-700 pl-6 lg:pl-8 py-2">
                         <div className="absolute top-0 left-[-5px] w-2 h-2 rounded-full bg-blue-primary shadow-[0_0_10px_rgba(30,79,255,0.8)]" />
                         <span className="font-mono text-xs text-zinc-500 tracking-widest uppercase mb-4 block">03</span>
-                        <h3 className="font-serif italic text-3xl text-white mb-3">Build + Optimize</h3>
+                        <h3 className="font-serif italic text-2xl sm:text-3xl text-white mb-3">Build + Optimize</h3>
                         <p className="font-sans text-zinc-400 leading-relaxed text-sm">
                             Engineering zero-jank, sub-second load times using cutting-edge frameworks. Because speed is the foundation of conversion.
                         </p>

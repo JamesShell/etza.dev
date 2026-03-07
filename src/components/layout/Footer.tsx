@@ -111,15 +111,15 @@ export function Footer() {
     return (
         <div ref={footerRef}>
             {/* Banner 1: Let's Talk & Contact Form (Dark) */}
-            <section className="talk-section bg-[#0f0f0f] text-white pt-32 pb-12 px-6 lg:px-12">
-                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center lg:gap-24">
+            <section className="talk-section bg-[#0f0f0f] text-white pt-20 md:pt-32 pb-12 px-6 lg:px-12">
+                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 md:gap-16 items-center lg:gap-24">
                     {/* Left Column */}
                     <div className="w-full lg:w-1/2 flex flex-col">
-                        <h2 className="talk-title font-sans font-bold text-7xl md:text-9xl tracking-tighter mb-12 leading-none">
+                        <h2 className="talk-title font-sans font-bold text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tighter mb-8 md:mb-12 leading-none">
                             Let's<br />talk
                         </h2>
 
-                        <p className="talk-content font-sans text-2xl md:text-3xl text-zinc-400 font-medium leading-[1.3] mb-16 max-w-md">
+                        <p className="talk-content font-sans text-xl sm:text-2xl md:text-3xl lg:text-3xl text-zinc-400 font-medium leading-[1.3] mb-12 md:mb-16 max-w-md">
                             <span className="text-white font-bold tracking-tight">Have an idea in mind</span> — website,
                             app, or rebrand? Let's make it real.
                         </p>
@@ -199,10 +199,10 @@ export function Footer() {
                     </div>
 
                     <div
-                        className="email-address relative group cursor-pointer"
+                        className="email-address relative group cursor-pointer w-full max-w-[90vw]"
                         onClick={handleCopyEmail}
                     >
-                        <h2 className="font-sans font-bold text-5xl md:text-6xl lg:text-7xl text-white tracking-tight mb-8 transition-colors hover:text-zinc-400">
+                        <h2 className="font-sans font-bold text-2xl sm:text-3xl md:text-5xl lg:text-7xl text-white tracking-tight mb-8 transition-colors hover:text-zinc-400 break-words">
                             ettozany@gmail.com
                         </h2>
 

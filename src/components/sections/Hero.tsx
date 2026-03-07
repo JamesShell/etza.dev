@@ -101,7 +101,7 @@ export function Hero() {
 
                     {/* Headline */}
                     <motion.h1
-                        className="text-[12vw] sm:text-[5.5rem] lg:text-[7.5rem] font-bold text-black leading-[0.95] mb-10 tracking-[-0.06em]"
+                        className="text-[12vw] sm:text-5xl md:text-6xl lg:text-[6.5rem] font-bold text-black leading-[0.95] mb-6 sm:mb-8 tracking-[-0.04em]"
                         variants={item}
                     >
                         LEVEL UP YOUR<br />
@@ -111,17 +111,17 @@ export function Hero() {
 
                     {/* Subheadline */}
                     <motion.p
-                        className="text-lg sm:text-xl text-zinc-500 leading-relaxed max-w-xl mb-10"
+                        className="text-sm sm:text-base lg:text-xl text-zinc-500 leading-relaxed max-w-xl mb-6 sm:mb-8"
                         variants={item}
                     >
                         Design & engineering for agencies who'd rather deliver results than wrestle with their own website.
                     </motion.p>
 
                     {/* CTA */}
-                    <motion.div className="flex flex-col sm:flex-row gap-4 items-start" variants={item}>
+                    <motion.div className="flex flex-row gap-3 sm:gap-4 items-center sm:items-start flex-wrap" variants={item}>
                         <Button
                             variant="primary"
-                            className="font-semibold text-[17px] flex items-center justify-center transition-all duration-300 shadow-xl shadow-black/10"
+                            className="font-semibold text-[14px] sm:text-[17px] flex items-center justify-center transition-all duration-300 shadow-xl shadow-black/10 px-4 sm:px-8 py-2.5 sm:py-4"
                             onClick={scrollToWork}
                             onMouseEnter={() => setHoveredOne("about")}
                             onMouseLeave={() => setHoveredOne("")}
@@ -138,7 +138,7 @@ export function Hero() {
                         >
                             <Button
                                 variant="secondary"
-                                className="bg-transparent border border-zinc-300 w-full sm:w-auto text-black font-semibold text-[17px] hover:bg-zinc-100/50 transition-all duration-300"
+                                className="bg-transparent border border-zinc-300 text-black font-semibold text-[14px] sm:text-[17px] hover:bg-zinc-100/50 transition-all duration-300 px-4 sm:px-8 py-2.5 sm:py-4"
                                 onMouseEnter={() => setHoveredOne("about")}
                                 onMouseLeave={() => setHoveredOne("")}
                             >
@@ -150,11 +150,11 @@ export function Hero() {
 
                 {/* ---------- Right: 3-D canvas (fixed layer) ---------- */}
                 <motion.div
-                    className="fixed inset-0 z-[-1] flex items-center justify-center pointer-events-none will-change-transform overflow-visible"
+                    className="fixed inset-0 z-[-1] flex items-end lg:items-center justify-center pointer-events-none will-change-transform overflow-visible"
                     style={{ x: isDesktop ? canvasX : 0 }}
                 >
                     <motion.div
-                        className="relative w-full h-full bg-transparent will-change-transform overflow-visible"
+                        className="relative w-full h-[60vh] lg:h-full will-change-transform overflow-visible mb-[-10vh] lg:mb-0"
                         style={{
                             opacity: canvasOpacity,
                             y: canvasY,
@@ -162,7 +162,7 @@ export function Hero() {
                             WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent 100%)",
                         }}
                     >
-                        <div className="w-full h-full transform translate-y-12 scale-110 lg:scale-100">
+                        <div className="w-full h-full transform translate-y-0 lg:translate-y-12 scale-[1.3] lg:scale-100">
                             <MonkeyCanvas
                                 className="w-full h-full invert dark:invert-0 object-contain"
                                 hovered={hoveredOne}

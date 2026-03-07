@@ -58,14 +58,14 @@ export function FAQ() {
     }, [openIndex]);
 
     return (
-        <section id="faq" className="w-full py-32 bg-zinc-50 border-t border-zinc-200">
-            <div className="container mx-auto px-6 max-w-7xl flex flex-col lg:flex-row gap-16 lg:gap-24">
+        <section id="faq" className="w-full py-20 md:py-32 bg-zinc-50 border-t border-zinc-200">
+            <div className="container mx-auto px-6 max-w-7xl flex flex-col lg:flex-row gap-12 lg:gap-24">
                 {/* Left Side: Title */}
                 <div className="w-full lg:w-5/12 lg:sticky lg:top-32 self-start">
-                    <h2 className="font-sans font-bold text-5xl md:text-7xl text-ink tracking-tighter mb-6 leading-none">
+                    <h2 className="font-sans font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-ink tracking-tighter mb-4 md:mb-6 leading-none">
                         FAQ
                     </h2>
-                    <p className="font-sans text-xl text-zinc-600 max-w-sm leading-relaxed">
+                    <p className="font-sans text-lg md:text-xl text-zinc-600 max-w-sm leading-relaxed">
                         Got questions? I've got answers. Here's everything you need to know about working with me.
                     </p>
                 </div>

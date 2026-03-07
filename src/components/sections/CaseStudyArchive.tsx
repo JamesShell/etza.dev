@@ -23,18 +23,18 @@ export function CaseStudyArchive({ studies }: { studies: CaseStudy[] }) {
     };
 
     return (
-        <section id="archive" className="relative w-full bg-white pt-24 pb-48">
+        <section id="archive" className="relative w-full bg-white pt-16 md:pt-24 pb-24 md:pb-48">
 
-            <div className="container mx-auto mb-16 px-4 md:px-0">
-                <h2 className="font-sans font-bold text-4xl lg:text-5xl text-ink tracking-tight mb-4">
+            <div className="container mx-auto px-6 max-w-[1400px] mb-12 md:mb-16">
+                <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-ink tracking-tight mb-4">
                     The Archive.
                 </h2>
-                <p className="font-serif italic text-xl text-zinc-500 max-w-xl">
+                <p className="font-serif italic text-lg md:text-xl text-zinc-500 max-w-xl">
                     Deep dives into system thinking, technical architecture, and resulting metrics.
                 </p>
             </div>
 
-            <div className="relative h-full flex flex-col items-center gap-12 sm:gap-16 pt-8 pb-32 px-4 md:px-0">
+            <div className="relative h-full flex flex-col items-center gap-12 sm:gap-16 pt-4 md:pt-8 pb-16 md:pb-32 px-4 md:px-6">
                 {studies.map((study, index) => {
                     const style = getCardStyle(index);
 

@@ -42,19 +42,19 @@ export function FeaturedWork({ works }: FeaturedWorkProps) {
 
     const getWidthClass = (width: string) => {
         return width === 'narrow'
-            ? 'w-[70vw] sm:w-[400px] lg:w-[550px] xl:w-[650px]'
-            : 'w-[85vw] sm:w-[600px] lg:w-[850px] xl:w-[1000px]';
+            ? 'w-[85vw] sm:w-[350px] lg:w-[450px] xl:w-[550px]'
+            : 'w-[90vw] sm:w-[500px] lg:w-[700px] xl:w-[900px]';
     };
 
     return (
-        <section id="work" className="relative w-full pt-24 lg:pt-32 bg-white overflow-hidden">
+        <section id="work" className="relative w-full pt-20 max-w-[100vw] lg:pt-32 bg-white overflow-hidden">
             <div className="container mx-auto px-6 max-w-[1400px]">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-8 md:mb-12">
                     <div>
-                        <h2 className="font-sans font-bold text-4xl md:text-5xl tracking-tight text-ink mb-3">
+                        <h2 className="font-sans font-bold text-3xl sm:text-4xl md:text-5xl tracking-tight text-ink mb-2 md:mb-3">
                             Selected Works
                         </h2>
-                        <p className="font-sans text-xl text-zinc-500 max-w-lg">
+                        <p className="font-sans text-lg md:text-xl text-zinc-500 max-w-lg">
                             A glimpse into some of my recent digital products and engineered outcomes.
                         </p>
                     </div>
@@ -81,7 +81,7 @@ export function FeaturedWork({ works }: FeaturedWorkProps) {
             <div className="w-full">
                 <div
                     ref={scrollContainerRef}
-                    className="flex gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory pb-12 pt-4 px-6 md:px-[10vw] xl:px-[15vw] hide-scrollbar"
+                    className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory pb-12 pt-4 px-6 md:px-12 lg:px-[max(6vw,calc((100vw-1400px)/2+24px))] hide-scrollbar"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {works.map((work) => {
@@ -95,7 +95,7 @@ export function FeaturedWork({ works }: FeaturedWorkProps) {
                             >
                                 {/* Conditional Layout: Videos get the inner frame, Images fill the container straight away */}
                                 {isVideoUrl(work.image_url) ? (
-                                    <div className="relative w-full h-[50vw] sm:h-[400px] lg:h-[550px] xl:h-[650px] rounded-[24px] p-2 sm:p-4 bg-zinc-100 border border-zinc-200/80 mb-6 shadow-sm flex items-center justify-center transition-all duration-500 group-hover:shadow-md group-hover:bg-zinc-200/50">
+                                    <div className="relative w-full h-[60vw] sm:h-[400px] lg:h-[450px] xl:h-[550px] rounded-[24px] p-2 sm:p-4 bg-zinc-100 border border-zinc-200/80 mb-4 md:mb-6 shadow-sm flex items-center justify-center transition-all duration-500 group-hover:shadow-md group-hover:bg-zinc-200/50">
                                         <video
                                             src={work.image_url}
                                             autoPlay muted loop playsInline
