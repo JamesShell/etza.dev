@@ -3,8 +3,11 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
-html {
-  font-size: 80%;
+/* // Only apply for smaller screens */
+@media screen and (max-width: 1900px) {
+  html {
+    font-size: 80%;
+  }
 }
 
 @custom-variant dark (&:is(.dark *));

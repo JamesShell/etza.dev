@@ -95,7 +95,7 @@ export function FeaturedWork({ works }: FeaturedWorkProps) {
                             >
                                 {/* Conditional Layout: Videos get the inner frame, Images fill the container straight away */}
                                 {isVideoUrl(work.image_url) ? (
-                                    <div className="relative w-full h-[60vw] sm:h-[400px] lg:h-[450px] xl:h-[550px] rounded-[24px] p-2 sm:p-4 bg-zinc-100 border border-zinc-200/80 mb-4 md:mb-6 shadow-sm flex items-center justify-center transition-all duration-500 group-hover:shadow-md group-hover:bg-zinc-200/50">
+                                    <div className="relative w-full h-[50vw] sm:h-[400px] lg:h-[550px] xl:h-[650px] rounded-[24px] p-2 sm:p-4 bg-zinc-100 border border-zinc-200/80 mb-6 shadow-sm flex items-center justify-center transition-all duration-500 group-hover:shadow-md group-hover:bg-zinc-200/50">
                                         <video
                                             src={work.image_url}
                                             autoPlay muted loop playsInline
