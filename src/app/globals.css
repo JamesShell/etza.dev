@@ -3,45 +3,66 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
-/* // Only apply for smaller screens */
-@media screen and (max-width: 1900px) {
-  html {
-    font-size: 80%;
-  }
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-blue-primary: #1E4FFF;
-  /* Accent Blue */
-  --color-blue-95: #F9FAFB;
-  /* Light Gray instead of light blue */
-  --color-blue-80: #E5E7EB;
-  /* Gray instead of medium-light blue */
-  --color-blue-60: #9CA3AF;
-  /* Gray */
-  --color-blue-40: #4B5563;
-  /* Dark Gray */
-  --color-blue-20: #1F2937;
-  /* Very Dark Gray */
-  --color-blue-deep: #050505;
-  /* Near Black */
+  /* ---------------------------------------------------------------
+     Site palette — deliberately achromatic, on a warm neutral base.
+     The only colour anywhere on this site comes from the work itself.
+     Do not add an accent hue here; use weight, spacing or motion.
+
+     The page is pure white, so every grey here is neutral to match.
+     Don't reintroduce a warm cast in one token alone — a cream card
+     or a brown-black on a white page reads as a mistake, not warmth.
+
+     With every border removed, the step between --color-void and
+     --color-shell is the only thing separating a card from the page,
+     so don't close that gap.
+
+     Text greys are set against --color-void and all clear 4.5:1.
+     --------------------------------------------------------------- */
+  --color-void: #ffffff;
+  /* page */
+  --color-shell: #f4f4f5;
+  /* cards, wells */
+  --color-raise: #e8e8ea;
+  /* hover state */
+  --color-hairline: #e8e8ea;
+  /* reserved — the design carries no rules */
+  --color-edge: #c2c2c6;
+  /* separator glyphs, muted marks */
+  --color-chalk: #17171a;
+  /* primary text */
+  --color-ash: #55555c;
+  /* secondary text */
+  --color-dust: #6c6c74;
+  /* labels, metadata */
+
+  /* The one hue on the site, and it is functional rather than decorative:
+     required marks and validation errors only. Do not reach for it to
+     brighten something up — the moment it decorates, it stops warning. */
+  --color-alert: #c0392b;
+
+  /* Legacy tokens — still used by /admin and the policy pages */
   --color-ink: #000000;
-  /* Pure Black */
-  --color-paper: #FFFFFF;
-  /* Pure White */
+  --color-paper: #ffffff;
 
-  --color-background: var(--color-paper);
-  --color-foreground: var(--color-ink);
+  --color-background: var(--color-void);
+  --color-foreground: var(--color-chalk);
 
-  --font-sans: var(--font-jakarta), var(--font-outfit), sans-serif;
-  --font-serif: var(--font-cormorant), serif;
-  --font-mono: var(--font-mono-code), monospace;
+  /* ---------------------------------------------------------------
+     One typeface, three roles. `display` and `sans` deliberately
+     resolve to the same family — the token split exists so headings
+     can be retuned later, not so a second face can be slipped in.
+     `mono` is system-only and is reserved for /admin inputs where
+     character alignment actually matters (slugs, JSON). It must not
+     appear on a public page.
+     --------------------------------------------------------------- */
+  --font-display: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --radius-system: 2rem;
-  --radius-system-lg: 3rem;
-  --radius-system-xl: 4rem;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,11 +71,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -75,14 +91,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* shadcn primitives, scoped to /admin */
 :root {
-  background-color: var(--color-paper);
-  color: var(--color-ink);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -102,11 +114,6 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -117,98 +124,104 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Forcing light mode for portfolio per instructions or adjusting if needed. The instructions imply a specific palette regardless of mode, but we can set background to Paper. Let's stick to the exact colors. */
-    --color-background: var(--color-paper);
-    --color-foreground: var(--color-ink);
-  }
+html {
+  color-scheme: light;
 }
 
 body {
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+  background-color: var(--color-void);
+  color: var(--color-chalk);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global CSS Noise Overlay */
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+/* Numerals line up in tables, indexes and the clock */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
-/* Base Utility Classes for Glassmorphism & Borders */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(203, 214, 255, 0.3);
-  /* Blue-80 low opacity */
+/* The blinking face stands in for the pointer. The native cursor is hidden
+   only under `.cursor-face-active`, which CursorFace puts on <html> once it has
+   mounted and taken over — so /admin, touch devices, and any page where the
+   component doesn't run keep their ordinary pointer instead of having none.
+   Don't unscope these rules; that class is the whole safety mechanism. */
+@media (pointer: fine) {
+
+  .cursor-face-active :is(body,
+    a,
+    button,
+    summary,
+    [role='button']) {
+    cursor: none;
+  }
+
+  /* Text and fields keep a real cursor: an I-beam tells you it's selectable,
+     and the face can't sit inside an input. */
+  .cursor-face-active :is(input,
+    textarea,
+    select,
+    [contenteditable='true']) {
+    cursor: auto;
+  }
+
+  /* Embedded documents keep theirs too. CursorFace drops the class entirely on
+     the way in, so this only covers the frame's own edges — but an iframe is
+     another site's interface, and it should look like one. */
+  .cursor-face-active :is(iframe, [data-cursor-native]),
+  .cursor-face-active :is(iframe, [data-cursor-native]) * {
+    cursor: auto;
+  }
+
+  .cursor-face {
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* Above everything, always. It stands in for the native pointer, so any
+       overlay that covers it — the cookie banner, the loader — leaves the
+       page looking like it has no cursor at all. */
+    z-index: 9999;
+    pointer-events: none;
+    will-change: transform;
+    transition: opacity 200ms ease-out;
+  }
 }
 
-/* Cinematic Dark Sections */
-.bg-cinematic {
-  background-color: var(--color-blue-deep);
-  color: var(--color-paper);
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.bg-cinematic .glass-panel {
-  background: rgba(11, 22, 56, 0.6);
-  /* Blue-Deep */
-  border: 1px solid rgba(203, 214, 255, 0.1);
-}
-
-/* Generative Dotted Field Pattern for Hero */
-.dotted-field {
-  background-image: radial-gradient(var(--color-blue-80) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  ::selection {
+    background: var(--color-chalk);
+    color: var(--color-void);
+  }
+
+  /* One focus treatment for the whole site — visible on every dark surface */
+  :focus-visible {
+    outline: 2px solid var(--color-chalk);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

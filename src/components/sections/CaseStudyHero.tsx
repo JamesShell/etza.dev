@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { isVideoUrl } from '@/lib/utils';
 
 interface CaseStudyHeroProps {
@@ -11,44 +12,61 @@ interface CaseStudyHeroProps {
 
 export function CaseStudyHero({ title, type, description, metrics, heroImage }: CaseStudyHeroProps) {
     return (
-        <section className="relative w-full bg-white pt-48 pb-24 border-b border-zinc-200 overflow-hidden">
-            <div className={`container mx-auto px-6 ${heroImage ? 'flex flex-col lg:flex-row items-center gap-12 lg:gap-16' : ''}`}>
-                <div className={heroImage ? "w-full lg:w-1/2" : "max-w-4xl"}>
-                    <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest block mb-6 py-1 px-3 border border-zinc-200 rounded-full inline-block">
-                        {type}
-                    </span>
-                    <h1 className="font-sans font-bold text-5xl md:text-7xl text-ink tracking-tight mb-8 leading-[1.1]">
-                        {title}
-                    </h1>
-                    <p className="font-serif italic text-2xl text-zinc-600 mb-16 max-w-2xl leading-relaxed">
-                        {description}
-                    </p>
+        <section className="mx-auto max-w-[1240px] px-5 pt-14 md:px-8 md:pt-20">
+            <p className="text-[12px] text-dust">{type}</p>
 
-                    {metrics && metrics.length > 0 && (
-                        <div className="w-full flex flex-col pt-12">
-                            {metrics.map((metric, i) => (
-                                <div key={i} className={`flex flex-col md:flex-row md:items-start justify-between py-6 border-t border-zinc-200 ${i === metrics.length - 1 ? 'border-b' : ''}`}>
-                                    <div className="font-sans text-sm text-zinc-500 mb-2 md:mb-0 shrink-0 md:w-1/4">{metric.label}</div>
-                                    <div className="font-sans text-lg text-ink font-medium md:w-3/4 md:text-right leading-relaxed flex flex-wrap md:justify-end">
-                                        {metric.value}
-                                    </div>
-                                </div>
-                            ))}
+            <h1 className="mt-5 max-w-[16ch] font-display text-[clamp(34px,6vw,62px)] font-medium leading-[1.05] tracking-[-0.04em] text-chalk">
+                {title}
+            </h1>
+
+            <p className="mt-7 max-w-[58ch] font-sans text-[17px] leading-relaxed text-ash md:text-[18px]">
+                {description.split('\n\n')[0]}
+            </p>
+
+            {metrics && metrics.length > 0 && (
+                <dl className="mt-12">
+                    {metrics.map((metric, i) => (
+                        <div
+                            key={i}
+                            className="flex flex-col gap-1 py-4 sm:flex-row sm:gap-8"
+                        >
+                            <dt className="shrink-0 text-[12px] text-dust sm:w-[160px]">
+                                {metric.label}
+                            </dt>
+                            <dd className="font-sans text-[15px] text-chalk">{metric.value}</dd>
                         </div>
+                    ))}
+                </dl>
+            )}
+
+            {heroImage && (
+                <div className="mt-12 overflow-hidden rounded-2xl bg-shell md:mt-16">
+                    {isVideoUrl(heroImage) ? (
+                        <video
+                            src={heroImage}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            aria-label={`${title} — ${type}`}
+                            className="block w-full"
+                        />
+                    ) : (
+                        /* The largest contentful paint on this route, so it
+                           loads eagerly rather than waiting on the observer. */
+                        <Image
+                            src={heroImage}
+                            alt={`${title} — ${type}`}
+                            width={1240}
+                            height={0}
+                            sizes="(min-width: 1240px) 1240px, 100vw"
+                            priority
+                            className="block h-auto w-full"
+                        />
                     )}
                 </div>
-                {heroImage && (
-                    <div className="w-full lg:w-1/2 mt-16 lg:mt-0">
-                        <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-200">
-                            {isVideoUrl(heroImage) ? (
-                                <video src={heroImage} autoPlay muted loop playsInline className="w-full h-auto block" />
-                            ) : (
-                                <img src={heroImage} alt={title} className="w-full h-auto block" />
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
+            )}
         </section>
     );
 }

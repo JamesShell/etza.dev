@@ -15,10 +15,17 @@ export interface RichContentBlock {
 
 export interface Database {
     public: {
-        Views: { [key: string]: { Row: Record<string, unknown> } }
-        Functions: { [key: string]: unknown }
-        Enums: { [key: string]: unknown }
-        CompositeTypes: { [key: string]: unknown }
+        /**
+         * Empty rather than an index signature. With `{ [key: string]: ... }`
+         * here, a table name matches Views as well as Tables, supabase-js can't
+         * pick an overload, and `.insert()` resolves its argument to `never` —
+         * which is what broke the contact route. This is the shape the Supabase
+         * type generator emits for a schema with no views.
+         */
+        Views: { [_ in never]: never }
+        Functions: { [_ in never]: never }
+        Enums: { [_ in never]: never }
+        CompositeTypes: { [_ in never]: never }
         Tables: {
             case_studies: {
                 Row: {
@@ -87,6 +94,43 @@ export interface Database {
                     scope_of_work?: string[]
                     content?: Json
                 }
+                Relationships: []
+            }
+            messages: {
+                Row: {
+                    id: string
+                    created_at: string
+                    name: string
+                    email: string
+                    kind: string
+                    company: string | null
+                    location: string | null
+                    budget: string | null
+                    message: string
+                }
+                Insert: {
+                    id?: string
+                    created_at?: string
+                    name: string
+                    email: string
+                    kind: string
+                    company?: string | null
+                    location?: string | null
+                    budget?: string | null
+                    message: string
+                }
+                Update: {
+                    id?: string
+                    created_at?: string
+                    name?: string
+                    email?: string
+                    kind?: string
+                    company?: string | null
+                    location?: string | null
+                    budget?: string | null
+                    message?: string
+                }
+                Relationships: []
             }
             selected_works: {
                 Row: {
@@ -122,6 +166,15 @@ export interface Database {
                     show_hover_overlay?: boolean
                     sort_order?: number
                 }
+                /**
+                 * Required by postgrest-js's `GenericTable`. Without it the
+                 * schema doesn't satisfy `GenericSchema`, the client silently
+                 * falls back to its default generic, and every `.insert()`
+                 * argument resolves to `never`. Empty is correct — nothing here
+                 * is joined through PostgREST; the home page matches
+                 * `case_study_id` in application code.
+                 */
+                Relationships: []
             }
         }
     }
@@ -130,6 +183,9 @@ export interface Database {
 export type CaseStudy = Database['public']['Tables']['case_studies']['Row'];
 export type CaseStudyInsert = Database['public']['Tables']['case_studies']['Insert'];
 export type CaseStudyUpdate = Database['public']['Tables']['case_studies']['Update'];
+
+export type Message = Database['public']['Tables']['messages']['Row'];
+export type MessageInsert = Database['public']['Tables']['messages']['Insert'];
 
 export type SelectedWork = Database['public']['Tables']['selected_works']['Row'];
 export type SelectedWorkInsert = Database['public']['Tables']['selected_works']['Insert'];

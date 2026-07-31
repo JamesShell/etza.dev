@@ -1,57 +1,80 @@
-'use client';
+import { SiteNav } from '@/components/layout/SiteNav';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+export const metadata: Metadata = pageMetadata({
+    title: 'Cookie policy',
+    description:
+        'Which cookies etza.dev sets and why. Analytics here is cookieless; the only storage used is the consent choice itself and whatever Cal.com needs to book a call.',
+    path: '/cookies',
+});
 
 export default function CookiesPage() {
     return (
-        <main className="min-h-screen bg-white selection:bg-zinc-200 selection:text-ink">
-            <Navbar />
+        <main className="min-h-screen">
+            <SiteNav />
 
-            <section className="pt-40 lg:pt-48 pb-32 px-4 md:px-[10vw] xl:px-[15vw]">
-                <div className="max-w-4xl mx-auto">
-                    <Link href="/" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-ink transition-colors mb-12">
-                        <ArrowLeft size={16} />
-                        Back to Home
-                    </Link>
-                    
-                    <h1 className="text-4xl md:text-6xl font-sans font-bold text-ink tracking-tighter mb-12">
-                        Cookie Policy
+            <div className="mx-auto max-w-[1240px] px-5 md:px-8">
+                <section className="py-16 md:py-24">
+                    <h1 className="font-display text-[clamp(30px,5vw,48px)] font-medium tracking-[-0.04em] text-chalk">
+                        Cookie policy
                     </h1>
-                    
-                    <div className="prose prose-zinc prose-lg max-w-none font-sans text-zinc-600">
-                        <p className="mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+                    <p className="mt-4 text-[12px] text-dust">
+                        Last updated 31 July 2026
+                    </p>
 
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">1. What are cookies?</h2>
-                        <p className="mb-6">
-                            Cookies are small text files that are placed on your computer or mobile device when you visit a website. 
-                            They are widely used to make websites work more efficiently and to provide statistical information to the owners of the site.
-                        </p>
+                    <div className="mt-12 max-w-[68ch] space-y-10">
+                        <section>
+                            <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
+                                What cookies are
+                            </h2>
+                            <p className="mt-3 font-sans text-[15px] leading-relaxed text-ash">
+                                Small text files a site stores on your device, used to keep it working and
+                                to count visits.
+                            </p>
+                        </section>
 
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">2. How I use cookies</h2>
-                        <p className="mb-6">
-                            I use cookies to understand how you use my site, analyze site traffic, and improve your experience. 
-                            Specifically, I use Google Analytics to collect data on site usage.
-                        </p>
+                        <section>
+                            <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
+                                What this site sets
+                            </h2>
+                            <dl className="mt-5">
+                                <div className="flex flex-col gap-1 py-4 sm:flex-row sm:gap-8">
+                                    <dt className="shrink-0 text-[12px] text-dust sm:w-[130px]">
+                                        Essential
+                                    </dt>
+                                    <dd className="font-sans text-[15px] leading-relaxed text-ash">
+                                        Remembers that you dismissed the cookie notice. Stored in your browser,
+                                        never sent anywhere.
+                                    </dd>
+                                </div>
+                                <div className="flex flex-col gap-1 py-4 sm:flex-row sm:gap-8">
+                                    <dt className="shrink-0 text-[12px] text-dust sm:w-[130px]">
+                                        Analytics
+                                    </dt>
+                                    <dd className="font-sans text-[15px] leading-relaxed text-ash">
+                                        None. Umami counts visits and shows which pages get read without
+                                        setting a cookie or identifying anyone.
+                                    </dd>
+                                </div>
+                            </dl>
+                        </section>
 
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">3. Types of cookies I use</h2>
-                        <ul className="list-disc pl-6 mb-6 space-y-2">
-                            <li><strong>Essential cookies:</strong> These are required for the operation of my website.</li>
-                            <li><strong>Analytics cookies:</strong> These allow me to recognize and count the number of visitors and see how visitors move around my site.</li>
-                        </ul>
-
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">4. Managing cookies</h2>
-                        <p className="mb-6">
-                            Most web browsers allow some control of most cookies through the browser settings. 
-                            To find out more about cookies, including how to see what cookies have been set, visit aboutcookies.org or allaboutcookies.org.
-                        </p>
+                        <section>
+                            <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
+                                Turning them off
+                            </h2>
+                            <p className="mt-3 font-sans text-[15px] leading-relaxed text-ash">
+                                Every major browser can block or clear cookies in its settings. The site works
+                                fine without them.
+                            </p>
+                        </section>
                     </div>
-                </div>
-            </section>
-            
-            <Footer />
+                </section>
+
+                <SiteFooter />
+            </div>
         </main>
     );
 }

@@ -1,1 +1,0 @@
-export { MonkeyCanvas } from "./MonkeyCanvas";

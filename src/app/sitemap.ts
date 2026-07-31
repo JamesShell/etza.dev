@@ -1,51 +1,47 @@
 import { MetadataRoute } from 'next';
-import { supabase } from '@/lib/supabase';
-import { CaseStudy } from '@/types/database';
+import { getCaseStudySlugs } from '@/lib/queries';
+import { ROUTE_UPDATED, absoluteUrl } from '@/lib/seo';
+
+/** Re-read hourly so a case study published in /admin appears without a
+ *  redeploy. Without this the sitemap is frozen at build time. */
+export const revalidate = 3600;
+
+type Entry = {
+    path: string;
+    changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
+    priority: number;
+};
+
+/**
+ * `lastModified` is real here. Stamping `new Date()` on every route — which is
+ * what this file used to do — tells a crawler the entire site changed on every
+ * fetch, which is indistinguishable from telling it nothing. Static dates come
+ * from ROUTE_UPDATED in src/lib/seo.ts; case studies use their own row.
+ */
+const staticRoutes: Entry[] = [
+    { path: '/', changeFrequency: 'weekly', priority: 1 },
+    { path: '/contact', changeFrequency: 'yearly', priority: 0.9 },
+    { path: '/book', changeFrequency: 'yearly', priority: 0.8 },
+    { path: '/about', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
+    { path: '/cookies', changeFrequency: 'yearly', priority: 0.3 },
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://etza.dev'; // Adjust exactly to your real deployed domain
+    const studies = await getCaseStudySlugs();
 
-    // Fetch dynamic routes from database (e.g. case studies)
-    const { data: caseStudies } = await supabase
-        .from('case_studies')
-        .select('slug, created_at');
-        
-    const studies = (caseStudies as Pick<CaseStudy, 'slug' | 'created_at'>[]) || [];
-
-    const dynamicRoutes = studies.map((study) => ({
-        url: `${baseUrl}/work/${study.slug}`,
-        lastModified: new Date(study.created_at || new Date()),
-        changeFrequency: 'monthly' as const,
-        priority: 0.8,
-    }));
-
-    // Define all static pages
-    const staticRoutes = [
-        {
-            url: baseUrl, // Home page
-            lastModified: new Date(),
+    return [
+        ...staticRoutes.map((route) => ({
+            url: absoluteUrl(route.path),
+            lastModified: new Date(ROUTE_UPDATED[route.path] ?? Date.now()),
+            changeFrequency: route.changeFrequency,
+            priority: route.priority,
+        })),
+        ...studies.map((study) => ({
+            url: absoluteUrl(`/work/${study.slug}`),
+            lastModified: new Date(study.created_at ?? Date.now()),
             changeFrequency: 'monthly' as const,
-            priority: 1,
-        },
-        {
-            url: `${baseUrl}/book`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.9,
-        },
-        {
-            url: `${baseUrl}/privacy`,
-            lastModified: new Date(),
-            changeFrequency: 'yearly' as const,
-            priority: 0.5,
-        },
-        {
-            url: `${baseUrl}/cookies`,
-            lastModified: new Date(),
-            changeFrequency: 'yearly' as const,
-            priority: 0.5,
-        }
+            priority: 0.7,
+        })),
     ];
-
-    return [...staticRoutes, ...dynamicRoutes];
 }

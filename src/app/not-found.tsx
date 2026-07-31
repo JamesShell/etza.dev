@@ -1,79 +1,65 @@
-"use client";
-
-import React from "react";
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { motion } from "framer-motion";
-import { Navbar } from '@/components/layout/Navbar';
-import { Button } from "@/components/ui/Button";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react/dist/ssr';
+import { SiteNav } from '@/components/layout/SiteNav';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+
+/**
+ * The root layout declares `index, follow`, and a page that doesn't override it
+ * inherits that tag — which on a 404 directly contradicts the `noindex` Next
+ * emits for not-found. This restates the restrictive answer so both tags agree.
+ */
+export const metadata: Metadata = {
+    title: 'Page not found',
+    robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
     return (
-        <main className="relative w-full h-screen flex flex-col bg-paper text-ink overflow-hidden select-none">
-            {/* Navbar is typically absolute or fixed, so it won't affect flex-1 centering much if handled correctly */}
-            <Navbar />
+        <main className="flex min-h-screen flex-col">
+            <SiteNav />
 
-            <div className="relative flex-1 flex flex-col items-center justify-center px-6 w-full h-full">
-                {/* Background Pattern - subtle center focus */}
-                <div
-                    className="absolute inset-0 z-0 dotted-field opacity-60 pointer-events-none"
-                    style={{
-                        maskImage: "radial-gradient(circle at center, black 10%, transparent 60%)",
-                        WebkitMaskImage: "radial-gradient(circle at center, black 10%, transparent 60%)"
-                    }}
-                ></div>
+            <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-5 md:px-8">
+                <section className="flex flex-1 flex-col justify-center py-24">
+                    <p className="tabular text-[12px] text-dust">404</p>
 
-                {/* Main Content Area */}
-                <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative z-10 flex flex-col items-center text-center max-w-5xl w-full"
-                >
-                    <motion.h1
-                        initial={{ scale: 0.85, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="text-[30vw] md:text-[22rem] font-bold tracking-tighter leading-none text-ink mb-24 mix-blend-darken"
-                    >
-                        404
-                    </motion.h1>
+                    <h1 className="mt-5 max-w-[16ch] font-display text-[clamp(30px,5vw,48px)] font-medium leading-[1.08] tracking-[-0.04em] text-chalk">
+                        This page isn&rsquo;t here.
+                    </h1>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="flex flex-col items-center -mt-8 md:-mt-12"
-                    >
-                        <h2 className="text-3xl md:text-6xl font-instrument italic text-zinc-800 mb-8">
-                            Page not found
-                        </h2>
+                    <p className="mt-6 max-w-[46ch] font-sans text-[16px] leading-relaxed text-ash">
+                        The link may be broken, or the page may have moved. The work is all still one
+                        click away.
+                    </p>
 
-                        <p className="max-w-md text-zinc-500 mb-12 text-lg md:text-xl leading-relaxed">
-                            The link might be broken, or the page may have been removed or moved to another URL.
-                        </p>
-
-                        <Link href="/">
-                            <Button
-                                variant="primary"
-                                className="font-semibold text-[18px] px-12 py-5 shadow-2xl shadow-black/10 flex items-center gap-3 transition-transform hover:scale-[1.03] active:scale-[0.97]"
-                            >
-                                <ArrowLeft className="w-6 h-6" weight="bold" />
-                                Return home
-                            </Button>
+                    <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
+                        <Link
+                            href="/"
+                            className="group inline-flex items-baseline gap-2 text-[12px] text-ash transition-colors hover:text-chalk"
+                        >
+                            <ArrowLeft
+                                size={14}
+                                aria-hidden="true"
+                                className="self-center transition-transform duration-300 group-hover:-translate-x-1"
+                            />
+                            Home
                         </Link>
-                    </motion.div>
-                </motion.div>
-            </div>
+                        <Link
+                            href="/#work"
+                            className="group inline-flex items-baseline gap-2 text-[12px] text-ash transition-colors hover:text-chalk"
+                        >
+                            Works
+                            <ArrowRight
+                                size={14}
+                                aria-hidden="true"
+                                className="self-center transition-transform duration-300 group-hover:translate-x-1"
+                            />
+                        </Link>
+                    </div>
+                </section>
 
-            {/* Simple Minimal Footer for 404 */}
-            <footer className="absolute bottom-0 w-full px-6 py-8 flex justify-between items-center text-zinc-400 text-sm z-20">
-                <p>© {new Date().getFullYear()} Ettouzany Abdelkader</p>
-                <div className="flex gap-6">
-                    <Link href="/privacy" className="hover:text-ink transition-colors">Privacy</Link>
-                    <Link href="/cookies" className="hover:text-ink transition-colors">Cookies</Link>
-                </div>
-            </footer>
+                <SiteFooter />
+            </div>
         </main>
     );
 }

@@ -1,67 +1,64 @@
-'use client';
+import type { Metadata } from 'next';
+import { SiteNav } from '@/components/layout/SiteNav';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { profile } from '@/content/profile';
+import { PERSON_ID, breadcrumbSchema, graph, pageMetadata } from '@/lib/seo';
+import { BookEmbed } from './BookEmbed';
 
-import { Navbar } from "@/components/layout/Navbar";
-import Cal, { getCalApi } from "@calcom/embed-react";
-import { useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { clickEvent } from "@/lib/gtag";
+export const metadata: Metadata = pageMetadata({
+    title: 'Book a call',
+    description:
+        'Book a short call with Abdelkader Ettouzany, web engineer and interface designer in Rabat. Bring the problem, not a brief — we’ll work out whether I’m the right person for it.',
+    path: '/book',
+});
 
 export default function BookPage() {
-    useEffect(() => {
-        (async function () {
-            const cal = await getCalApi({});
-            cal("ui", {
-                theme: "light",
-                styles: { branding: { brandColor: "#000000" } },
-                hideEventTypeDetails: false,
-                layout: "month_view"
-            });
-        })();
-    }, []);
+    const jsonLd = graph(
+        {
+            '@type': 'ContactPage',
+            name: 'Book a call',
+            url: 'https://etza.dev/book',
+            description: 'Schedule a short introductory call.',
+            mainEntity: { '@id': PERSON_ID },
+        },
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Book a call', path: '/book' },
+        ])
+    );
 
     return (
-        <main className="min-h-screen bg-white selection:bg-zinc-200 selection:text-ink">
-            <Navbar />
+        <main className="min-h-screen">
+            <JsonLd id="schema-book" data={jsonLd} />
+            <SiteNav />
 
-            <section className="pt-40 lg:pt-48 pb-20 px-4 md:px-[10vw] xl:px-[15vw]">
-                <div className="mb-12 text-center">
-                    <Link href="/" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-ink transition-colors mb-8">
-                        <ArrowLeft size={16} />
-                        Back to Home
-                    </Link>
-                    <h1 className="text-5xl md:text-7xl font-sans font-bold text-ink tracking-tighter mb-6">
-                        Let's Talk
+            <div className="mx-auto max-w-[1240px] px-5 md:px-8">
+                <section className="py-14 md:py-20">
+                    <h1 className="max-w-[14ch] font-display text-[clamp(30px,5vw,48px)] font-medium leading-[1.08] tracking-[-0.04em] text-chalk">
+                        Book a 20-minute call
                     </h1>
-                    <p className="text-xl text-zinc-600 font-sans max-w-2xl mx-auto leading-relaxed">
-                        Find a time that works for you. I'm looking forward to discussing how we can work together.
+                    <p className="mt-6 max-w-[52ch] font-sans text-[16px] leading-relaxed text-ash">
+                        Bring the problem, not a brief. We&rsquo;ll work out whether I&rsquo;m the right
+                        person for it, and what a sensible first step looks like.
                     </p>
-                    <p className="text-lg text-zinc-500 font-sans mt-3">
-                        Or email me at{' '}
-                        <Link 
-                            href="mailto:ettozany@gmail.com" 
-                            className="text-ink underline underline-offset-4 hover:text-zinc-600 transition-colors"
-                            onClick={() => clickEvent({
-                                action: 'send_email',
-                                category: 'engagement',
-                                label: 'Booking Page Mailto'
-                            })}
+                    <p className="mt-4 text-[12px] text-dust">
+                        Or email{' '}
+                        <a
+                            href={`mailto:${profile.email}`}
+                            data-umami-event="send_email"
+                            data-umami-event-label="Booking page"
+                            className="text-ash transition-colors hover:text-chalk"
                         >
-                            ettozany@gmail.com
-                        </Link>
+                            {profile.email}
+                        </a>
                     </p>
-                </div>
 
-                <div className="w-full bg-zinc-50 border border-zinc-200/50 rounded-3xl p-2 sm:p-4 shadow-sm">
-                    
-                        <Cal
-                            calLink="ettouza/30min"
-                            style={{ width: "100%", height: "100%", minHeight: "700px", overflow: "scroll", maxHeight: "2000px", maxWidth: "2000px" }}
-                            config={{ layout: 'month_view', theme: 'light' }}
-                        />
-                </div>
-            </section>
+                    <BookEmbed />
+                </section>
 
+                <SiteFooter />
+            </div>
         </main>
     );
 }

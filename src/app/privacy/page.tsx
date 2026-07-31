@@ -1,64 +1,81 @@
-'use client';
+import { SiteNav } from '@/components/layout/SiteNav';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import { profile } from '@/content/profile';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+export const metadata: Metadata = pageMetadata({
+    title: 'Privacy policy',
+    description:
+        'How etza.dev handles your data: what analytics records, what happens to an enquiry, who else processes it, and how to have it deleted.',
+    path: '/privacy',
+});
+
+const sections = [
+    {
+        heading: 'What I collect',
+        body: 'When you visit this site, analytics records your browser, approximate location and the pages you open. It sets no cookies and does not identify you or follow you to other sites. If you email me or book a call, I keep what you send so I can reply.',
+    },
+    {
+        heading: 'What I use it for',
+        body: 'Understanding which work people actually look at, and replying to enquiries. Nothing is sold, and nothing is used for advertising.',
+    },
+    {
+        heading: 'Who else sees it',
+        body: 'Umami processes site usage. Cal.com processes any call you book. No one else receives your data.',
+    },
+    {
+        heading: 'Your rights',
+        body: 'You can ask to see the personal data I hold about you, correct it, or have it deleted. Email me and I will action it.',
+    },
+];
 
 export default function PrivacyPage() {
     return (
-        <main className="min-h-screen bg-white selection:bg-zinc-200 selection:text-ink">
-            <Navbar />
+        <main className="min-h-screen">
+            <SiteNav />
 
-            <section className="pt-40 lg:pt-48 pb-32 px-4 md:px-[10vw] xl:px-[15vw]">
-                <div className="max-w-4xl mx-auto">
-                    <Link href="/" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-ink transition-colors mb-12">
-                        <ArrowLeft size={16} />
-                        Back to Home
-                    </Link>
-                    
-                    <h1 className="text-4xl md:text-6xl font-sans font-bold text-ink tracking-tighter mb-12">
-                        Privacy Policy
+            <div className="mx-auto max-w-[1240px] px-5 md:px-8">
+                <section className="py-16 md:py-24">
+                    <h1 className="font-display text-[clamp(30px,5vw,48px)] font-medium tracking-[-0.04em] text-chalk">
+                        Privacy policy
                     </h1>
-                    
-                    <div className="prose prose-zinc prose-lg max-w-none font-sans text-zinc-600">
-                        <p className="mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+                    <p className="mt-4 text-[12px] text-dust">
+                        Last updated 31 July 2026
+                    </p>
 
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">1. Information I collect</h2>
-                        <p className="mb-6">
-                            When you visit my site, I automatically collect certain information about your device, 
-                            including information about your web browser, IP address, time zone, and some of the cookies that are installed on your device.
-                        </p>
+                    <div className="mt-12 max-w-[68ch] space-y-10">
+                        {sections.map((section) => (
+                            <section key={section.heading}>
+                                <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
+                                    {section.heading}
+                                </h2>
+                                <p className="mt-3 font-sans text-[15px] leading-relaxed text-ash">
+                                    {section.body}
+                                </p>
+                            </section>
+                        ))}
 
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">2. How I use your information</h2>
-                        <p className="mb-6">
-                            I use the information I collect to communicate with you, screen my orders or requests for potential risk or fraud, 
-                            and provide you with information or advertising relating to my products or services according to the preferences you have shared with me.
-                        </p>
-
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">3. Sharing your personal information</h2>
-                        <p className="mb-6">
-                            I share your Personal Information with third parties to help me use your Personal Information, as described above. 
-                            For example, I use Google Analytics to help me understand how my visitors use the Site.
-                        </p>
-
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">4. Your rights</h2>
-                        <p className="mb-6">
-                            If you are a European resident, you have the right to access personal information I hold about you 
-                            and to ask that your personal information be corrected, updated, or deleted. 
-                            If you would like to exercise this right, please contact me.
-                        </p>
-
-                        <h2 className="text-2xl font-bold text-ink mt-12 mb-4">5. Contact me</h2>
-                        <p className="mb-6">
-                            For more information about my privacy practices, if you have questions, or if you would like to make a complaint, 
-                            please contact me by e-mail at ettozany@gmail.com.
-                        </p>
+                        <section>
+                            <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
+                                Contact
+                            </h2>
+                            <p className="mt-3 font-sans text-[15px] leading-relaxed text-ash">
+                                Questions or complaints go to{' '}
+                                <a
+                                    href={`mailto:${profile.email}`}
+                                    className="text-chalk underline decoration-edge underline-offset-4 transition-colors hover:decoration-chalk"
+                                >
+                                    {profile.email}
+                                </a>
+                                .
+                            </p>
+                        </section>
                     </div>
-                </div>
-            </section>
-            
-            <Footer />
+                </section>
+
+                <SiteFooter />
+            </div>
         </main>
     );
 }
