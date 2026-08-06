@@ -1,9 +1,10 @@
 -- Contact form storage. Run once in the Supabase SQL editor.
 --
 -- The site talks to Supabase with the anon key, so the policies below are what
--- stand between the table and the public: anyone may insert a message, nobody
--- may read one back. Reading is left to the service role, which the browser
--- never sees — do not add a select policy for anon.
+-- stand between the table and the public: anyone may insert a message, only a
+-- signed-in admin may read one back. Do not add a select policy for anon —
+-- `authenticated` is reachable only with a real Supabase session, which is what
+-- /admin holds.
 
 create table if not exists public.messages (
     id          uuid primary key default gen_random_uuid(),
@@ -29,6 +30,22 @@ create policy "anon can send a message"
     for insert
     to anon
     with check (true);
+
+-- The admin panel reads with the same anon key, but through a logged-in
+-- session, so it arrives as `authenticated`. Nothing else does.
+drop policy if exists "authenticated can read messages" on public.messages;
+create policy "authenticated can read messages"
+    on public.messages
+    for select
+    to authenticated
+    using (true);
+
+drop policy if exists "authenticated can delete a message" on public.messages;
+create policy "authenticated can delete a message"
+    on public.messages
+    for delete
+    to authenticated
+    using (true);
 
 -- Newest first, for the admin list.
 create index if not exists messages_created_at_idx

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { SignOut, Briefcase, Plus, Images, CalendarBlank } from '@phosphor-icons/react';
+import { SignOut, Briefcase, Plus, Images, CalendarBlank, EnvelopeSimple } from '@phosphor-icons/react';
 
 /**
  * The authenticated admin chrome. This is client-only — it reads the Supabase
@@ -86,6 +86,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     >
                         <CalendarBlank size={20} />
                         Bookings
+                    </Link>
+                    <Link
+                        href="/admin/messages"
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${pathname === '/admin/messages' ? 'bg-zinc-100 text-ink font-semibold' : 'text-zinc-500 hover:text-ink hover:bg-zinc-50'}`}
+                    >
+                        <EnvelopeSimple size={20} />
+                        Messages
                     </Link>
                 </nav>
                 <div className="p-4 border-t border-zinc-200">
