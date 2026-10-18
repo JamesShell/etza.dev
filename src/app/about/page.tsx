@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMetadata({
     // The layout template appends the name, so it isn't repeated here.
     title: 'About',
     description:
-        'Web engineer and interface designer in Rabat, Morocco. Four years designing and building real-estate platforms, early-stage products and agency work end to end — scope, design, build, and a repo you own.',
+        'Web engineer and designer in Casablanca, with four years designing and building websites, booking systems and web apps end to end.',
     path: '/about',
     ogType: 'profile',
 });
@@ -98,28 +98,11 @@ export default function AboutPage() {
                                     key={paragraph.slice(0, 40)}
                                     className="font-sans text-[17px] leading-[1.65] text-ash"
                                 >
-                                    {paragraph}
+                                    {paragraph.split(/\*(.+?)\*/).map((part, i) =>
+                                        i % 2 ? <em key={i}>{part}</em> : part
+                                    )}
                                 </p>
                             ))}
-
-                            {/* Indented, unbulleted and lower-case: it should
-                                read as an aside in the same voice, not as a
-                                spec list pretending to be one. */}
-                            <div>
-                                <p className="font-sans text-[17px] leading-[1.65] text-ash">
-                                    {about.listLead}
-                                </p>
-                                <ul className="mt-3 space-y-2 pl-5">
-                                    {about.list.map((item) => (
-                                        <li
-                                            key={item}
-                                            className="font-sans text-[17px] leading-[1.65] text-ash"
-                                        >
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
 
                             <p className="font-sans text-[17px] leading-[1.65] text-ash">
                                 {about.signoff}{' '}
@@ -201,22 +184,22 @@ export default function AboutPage() {
                     <Section id="next" label="Working together">
                         <p className="mb-6 max-w-[62ch] font-sans text-[17px] leading-[1.65] text-ash">
                             {profile.availability.headline} {profile.availability.detail}. If you
-                            have something in mind, the contact form is the fastest route — or book a
-                            call and we&rsquo;ll talk it through.
+                            have something in mind, the pricing estimate gives you a number in a minute
+                            — or book a call and we&rsquo;ll talk it through.
                         </p>
 
                         <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
                             <Link
-                                href="/contact"
-                                className="rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void transition-opacity hover:opacity-90"
+                                href="/pricing"
+                                className="press rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void hover:opacity-90"
                             >
-                                Start a project
+                                Get an estimate
                             </Link>
                             <Link
                                 href="/book"
                                 className="text-[15px] text-ash transition-colors hover:text-chalk"
                             >
-                                Book a 20-minute call
+                                Book a 30-minute call
                             </Link>
                             {/* Only once there's a file to download — the CV
                                 replaced the resume page, so this appears when

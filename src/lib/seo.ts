@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { capabilities, experience, faqs, profile, stack } from '@/content/profile';
+import { capabilities, experience, faqs, pricing, profile, stack } from '@/content/profile';
+import { PROJECT_KINDS, money } from '@/lib/pricing';
 import type { CaseStudy } from '@/types/database';
 
 /**
@@ -84,7 +85,7 @@ export function personSchema() {
         image: absoluteUrl('/images/avatar.jpg'),
         address: {
             '@type': 'PostalAddress',
-            addressLocality: 'Rabat',
+            addressLocality: profile.location.split(',')[0],
             addressCountry: 'MA',
         },
         knowsAbout: [...capabilities.map((c) => c.title), ...stack],
@@ -113,9 +114,10 @@ export function websiteSchema() {
 }
 
 /**
- * The service side of the same person. No price fields anywhere: the FAQ says
- * plainly that a number before the first call is a guess, and structured data
- * that contradicts the page it sits on is worse than none.
+ * The service side of the same person. Prices appear only as "from" figures
+ * (`priceRange` here, `minPrice` in the catalog below) — the starting prices
+ * are fixed and printed on /pricing; the totals are estimates, so no schema
+ * claims one.
  */
 export function professionalServiceSchema() {
     return {
@@ -127,13 +129,14 @@ export function professionalServiceSchema() {
         provider: { '@id': PERSON_ID },
         founder: { '@id': PERSON_ID },
         email: `mailto:${profile.email}`,
+        priceRange: `From ${money(Math.min(...PROJECT_KINDS.map((kind) => pricing.types[kind].base.price)))}`,
         areaServed: [
             { '@type': 'Country', name: 'Morocco' },
             { '@type': 'Place', name: 'Remote — worldwide' },
         ],
         address: {
             '@type': 'PostalAddress',
-            addressLocality: 'Rabat',
+            addressLocality: profile.location.split(',')[0],
             addressCountry: 'MA',
         },
         knowsLanguage: ['en', 'fr', 'ar'],
@@ -152,7 +155,68 @@ export function professionalServiceSchema() {
     };
 }
 
-/** The seven questions that already exist on the home page, made retrievable.
+/**
+ * Everything the pricing page sells, as data: each project type with its
+ * starting price and its add-ons at list price, plus the monthly plan. Built
+ * from the same `pricing` object as the estimator, so the two can't disagree.
+ */
+export function pricingSchema() {
+    const types = PROJECT_KINDS.map((kind) => {
+        const type = pricing.types[kind];
+        return {
+            '@type': 'Offer',
+            name: type.base.name,
+            description: type.base.detail,
+            url: absoluteUrl('/pricing'),
+            priceSpecification: {
+                '@type': 'PriceSpecification',
+                minPrice: type.base.price,
+                priceCurrency: 'USD',
+            },
+            itemOffered: {
+                '@type': 'Service',
+                name: type.title,
+                description: type.pitch,
+                provider: { '@id': PERSON_ID },
+            },
+            seller: { '@id': SERVICE_ID },
+            addOn: type.groups
+                .flatMap((group) => group.features)
+                .map((feature) => ({
+                    '@type': 'Offer',
+                    name: feature.name,
+                    description: feature.max ? `${feature.detail} Priced each.` : feature.detail,
+                    price: feature.price,
+                    priceCurrency: 'USD',
+                })),
+        };
+    });
+
+    return {
+        '@type': 'OfferCatalog',
+        '@id': `${SITE_URL}/pricing#catalog`,
+        name: 'Website and web app pricing',
+        url: absoluteUrl('/pricing'),
+        itemListElement: [
+            ...types,
+            {
+                '@type': 'Offer',
+                name: 'Monthly plan',
+                description: `Up to ${money(pricing.plan.capacity)} of work a month at one-off prices. Pause or cancel anytime.`,
+                url: absoluteUrl('/pricing'),
+                priceSpecification: {
+                    '@type': 'UnitPriceSpecification',
+                    price: pricing.plan.monthly,
+                    priceCurrency: 'USD',
+                    unitCode: 'MON',
+                },
+                seller: { '@id': SERVICE_ID },
+            },
+        ],
+    };
+}
+
+/** The questions that already exist on the home page, made retrievable.
  *  Answers are used whole — a truncated answer in schema is a different answer
  *  from the one on the page. */
 export function faqSchema() {
@@ -232,10 +296,10 @@ export function graph(...nodes: object[]) {
  * Bump the date on a route when you meaningfully change its copy.
  */
 export const ROUTE_UPDATED: Record<string, string> = {
-    '/': '2026-07-31',
-    '/about': '2026-07-31',
-    '/contact': '2026-07-31',
-    '/book': '2026-07-31',
+    '/': '2026-10-17',
+    '/about': '2026-10-17',
+    '/pricing': '2026-10-17',
+    '/book': '2026-10-17',
     '/privacy': '2026-07-31',
     '/cookies': '2026-07-31',
 };

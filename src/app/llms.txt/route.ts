@@ -1,4 +1,5 @@
 import { about, capabilities, experience, faqs, profile, stack } from '@/content/profile';
+import { pricingQuestions } from '@/lib/pricing';
 import { getCaseStudySlugs } from '@/lib/queries';
 import { SITE_URL, absoluteUrl } from '@/lib/seo';
 
@@ -38,14 +39,14 @@ export async function GET() {
     // point rather than an inconsistency.
     lines.push('## In his words');
     lines.push('');
-    lines.push(about.paragraphs[1]);
+    lines.push(about.paragraphs[0].replace(/\*/g, ''));
     lines.push('');
 
     lines.push('## Pages');
     lines.push('');
-    lines.push(`- [Home](${SITE_URL}): selected work, services, and the questions clients ask most.`);
+    lines.push(`- [Home](${SITE_URL}): selected work, how a project runs, and the questions clients ask most.`);
+    lines.push(`- [Pricing](${absoluteUrl('/pricing')}): an instant estimate for a website or web app, then a booked call to fix the price.`);
     lines.push(`- [About](${absoluteUrl('/about')}): background, how projects run, and what he does outside client work.`);
-    lines.push(`- [Contact](${absoluteUrl('/contact')}): project and role enquiries. Replies within a day.`);
     lines.push(`- [Book a call](${absoluteUrl('/book')}): a short introductory call, booked directly.`);
     if (profile.cv.href) {
         lines.push(`- [CV](${profile.cv.href}): the full record as a PDF, for hiring conversations.`);
@@ -69,6 +70,17 @@ export async function GET() {
         lines.push(`- **${capability.title}** — ${capability.detail}`);
     }
     lines.push('');
+
+    // Prices in words: answer engines quote sentences, and the estimator on
+    // /pricing is interactive, so this is the version they can read whole.
+    lines.push('## Pricing');
+    lines.push('');
+    for (const item of pricingQuestions()) {
+        lines.push(`### ${item.question}`);
+        lines.push('');
+        lines.push(item.answer.replace('The estimate above', `The estimate at ${absoluteUrl('/pricing')}`));
+        lines.push('');
+    }
 
     lines.push('## Stack');
     lines.push('');

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import { profile } from '@/content/profile';
@@ -12,6 +12,7 @@ import { clickEvent } from '@/lib/analytics';
  */
 export function Contact() {
     const [copied, setCopied] = useState(false);
+    const localTime = useLocalTime();
 
     const copyEmail = async () => {
         try {
@@ -51,18 +52,18 @@ export function Contact() {
                 <div>
                     <h3 className="mb-3 text-[12px] text-dust">Starting a project</h3>
                     <p className="mb-5 max-w-[42ch] font-sans text-[15px] leading-relaxed text-ash">
-                        Tell me what you&rsquo;re building and what&rsquo;s in the way. You&rsquo;ll get a
-                        reply within a day, with what I&rsquo;d do first.
+                        Get an estimate, then book a call with it. We start from your numbers instead of
+                        from zero.
                     </p>
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                         <Link
-                            href="/contact"
+                            href="/pricing"
                             onClick={() =>
-                                clickEvent({ action: 'open_contact_form', category: 'conversion', label: 'Project path' })
+                                clickEvent({ action: 'open_pricing', category: 'engagement', label: 'Project path' })
                             }
-                            className="rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void transition-opacity hover:opacity-90"
+                            className="press rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void hover:opacity-90"
                         >
-                            Start a project
+                            Get an estimate
                         </Link>
                         <Link
                             href="/book"
@@ -71,7 +72,7 @@ export function Contact() {
                             }
                             className="group inline-flex items-baseline gap-2 text-[14px] text-ash transition-colors hover:text-chalk"
                         >
-                            Book a call
+                            Book a 30-minute call
                             <ArrowRight
                                 size={14}
                                 aria-hidden="true"
@@ -79,6 +80,12 @@ export function Contact() {
                             />
                         </Link>
                     </div>
+                    {/* Blank until mounted: the server doesn't know the
+                        visitor's clock, and a mismatched time is a hydration
+                        error, so the line fills in on the client. */}
+                    <p className="mt-5 min-h-[1lh] text-[13px] text-dust">
+                        {localTime && <>It&rsquo;s {localTime} for me in Morocco right now.</>}
+                    </p>
                 </div>
 
                 <div>
@@ -125,4 +132,22 @@ export function Contact() {
             </div>
         </div>
     );
+}
+
+function useLocalTime() {
+    const [time, setTime] = useState('');
+
+    useEffect(() => {
+        const format = new Intl.DateTimeFormat('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: profile.timeZone,
+        });
+        const tick = () => setTime(format.format(new Date()));
+        tick();
+        const id = setInterval(tick, 30_000);
+        return () => clearInterval(id);
+    }, []);
+
+    return time;
 }

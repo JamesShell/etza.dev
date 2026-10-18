@@ -9,10 +9,10 @@ import { faqs } from '@/content/profile';
  * write, so it's worth recording. Umami's `data-umami-event` attributes do it
  * declaratively, which keeps this a server component with no JS of its own.
  */
-export function Working() {
+export function Working({ items = faqs }: { items?: readonly { question: string; answer: string }[] }) {
     return (
         <div className="max-w-[68ch]">
-            {faqs.map((faq) => (
+            {items.map((faq) => (
                 <details
                     key={faq.question}
                     className="group py-1"

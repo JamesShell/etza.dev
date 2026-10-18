@@ -6,11 +6,15 @@ import { profile } from '@/content/profile';
 /**
  * Sub-page navigation. The home page doesn't use this — there, the identity
  * rail is the navigation.
+ *
+ * Sticky and translucent rather than an opaque strip: the page scrolls under
+ * it, so it stays in reach without taking a fixed band of the screen. No rule
+ * underneath — the blur is the edge.
  */
 export function SiteNav() {
     return (
-        <header>
-            <div className="flex items-center justify-between gap-6 px-5 py-6 md:px-8 lg:px-10">
+        <header className="glass sticky top-0 z-40">
+            <div className="flex h-14 items-center justify-between gap-6 px-5 md:px-8 lg:px-10">
                 <Link
                     href="/"
                     className="group inline-flex items-baseline gap-2 text-[12px] text-ash transition-colors hover:text-chalk"
@@ -28,13 +32,16 @@ export function SiteNav() {
                     a nav entry that 404s is worse than one that isn't there. */}
                 <nav className="flex items-center gap-6 text-[13px] text-ash">
                     <Link href="/#work" className="transition-colors hover:text-chalk">
-                        Works
+                        Work
+                    </Link>
+                    <Link href="/pricing" className="hidden transition-colors hover:text-chalk sm:inline">
+                        Pricing
                     </Link>
                     <Link href="/about" className="transition-colors hover:text-chalk">
                         About
                     </Link>
-                    <Link href="/contact" className="transition-colors hover:text-chalk">
-                        Contact
+                    <Link href="/book" className="transition-colors hover:text-chalk">
+                        Book a call
                     </Link>
                     {profile.cv.href && (
                         <a

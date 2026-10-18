@@ -20,7 +20,7 @@ const dmSans = DM_Sans({
 
 const title = `${profile.name} — ${profile.role}`;
 const description =
-  'Web engineer and interface designer in Rabat. I design and build web interfaces end to end — real-estate platforms, startup products and agency work. Currently taking on new projects, and open to full-time roles.';
+  'Web engineer and designer in Casablanca. I design and build websites, booking and payment systems, and web apps for businesses, from the first call to launch.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,13 +33,14 @@ export const metadata: Metadata = {
   description,
   keywords: [
     'Web Developer',
-    'Front-end Engineer',
-    'UI/UX Designer',
-    'React Developer',
+    'Web Designer',
+    'Website Design and Development',
+    'Booking System Development',
+    'Web App Development',
     'Next.js Developer',
     'Laravel Developer',
     'Ettouzany',
-    'Rabat',
+    'Casablanca',
     'Morocco',
   ],
   authors: [{ name: profile.name, url: SITE_URL }],

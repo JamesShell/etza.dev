@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ArrowRight, CalendarBlank, CheckCircle } from '@phosphor-icons/react';
-import { profile } from '@/content/profile';
+import { budgets, profile } from '@/content/profile';
 import { clickEvent } from '@/lib/analytics';
 
 type Errors = Record<string, string>;
@@ -22,8 +23,33 @@ const KINDS = [
 const field =
     'w-full border-0 border-b border-edge bg-transparent px-0 py-2 font-sans text-[15px] text-chalk transition-colors placeholder:text-dust focus:border-chalk focus:outline-none focus:ring-0';
 
-export function ContactForm() {
+/**
+ * The form as the pricing estimate hands it over: `/contact?quote=…&budget=…`
+ * arrives with the message and budget already filled in. The contact page
+ * renders the plain form as this one's Suspense fallback, so the static HTML
+ * is still a working form before the query string is read.
+ */
+export function QuotedContactForm() {
+    const params = useSearchParams();
+    const budget = params.get('budget') ?? '';
+
+    return (
+        <ContactForm
+            initialMessage={params.get('quote')?.slice(0, 2000) ?? ''}
+            initialBudget={budgets.includes(budget) ? budget : ''}
+        />
+    );
+}
+
+export function ContactForm({
+    initialMessage = '',
+    initialBudget = '',
+}: {
+    initialMessage?: string;
+    initialBudget?: string;
+}) {
     const [kind, setKind] = useState('project');
+    const [budget, setBudget] = useState(initialBudget);
     const [errors, setErrors] = useState<Errors>({});
     const [failure, setFailure] = useState('');
     const [sending, setSending] = useState(false);
@@ -91,7 +117,7 @@ export function ContactForm() {
                         className="group inline-flex items-center gap-2 rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void transition-opacity hover:opacity-90"
                     >
                         <CalendarBlank size={15} weight="fill" aria-hidden="true" />
-                        Book a 20-minute call
+                        Book a 30-minute call
                         <ArrowRight
                             size={14}
                             aria-hidden="true"
@@ -167,9 +193,32 @@ export function ContactForm() {
                     Company sits beside it. "Something else" gets neither: at
                     that point I don't know enough to ask a useful question. */}
                 {kind === 'project' && (
-                    <Field name="budget" label="Rough budget" hint="Helps me scope honestly.">
-                        <input id="budget" name="budget" placeholder="e.g. 3–5k" className={field} />
-                    </Field>
+                    <fieldset className="border-0 p-0">
+                        <legend className="block text-[12px] uppercase tracking-[0.08em] text-dust">
+                            Rough budget
+                        </legend>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {budgets.map((option) => {
+                                const selected = budget === option;
+                                return (
+                                    <button
+                                        key={option}
+                                        type="button"
+                                        aria-pressed={selected}
+                                        // A second click clears it — budget is optional.
+                                        onClick={() => setBudget(selected ? '' : option)}
+                                        className={`cursor-pointer rounded-full px-3 py-1.5 text-[13px] transition-colors ${
+                                            selected ? 'bg-chalk text-void' : 'bg-shell text-ash hover:text-chalk'
+                                        }`}
+                                    >
+                                        {option}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <input type="hidden" name="budget" value={budget} />
+                        <p className="mt-2 text-[13px] text-dust">Helps me scope honestly.</p>
+                    </fieldset>
                 )}
 
                 {kind === 'role' && (
@@ -211,7 +260,8 @@ export function ContactForm() {
                         <textarea
                             id="message"
                             name="message"
-                            rows={5}
+                            rows={initialMessage ? initialMessage.split('\n').length + 2 : 5}
+                            defaultValue={initialMessage}
                             required
                             aria-required="true"
                             className={`${field} resize-y`}

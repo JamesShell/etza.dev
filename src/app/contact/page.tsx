@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { IdentityRail } from '@/components/layout/IdentityRail';
 import { SiteFooter } from '@/components/layout/SiteFooter';
-import { ContactForm } from '@/components/sections/ContactForm';
+import { ContactForm, QuotedContactForm } from '@/components/sections/ContactForm';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { profile } from '@/content/profile';
 import { PERSON_ID, SERVICE_ID, breadcrumbSchema, graph, pageMetadata } from '@/lib/seo';
@@ -9,7 +10,7 @@ import { PERSON_ID, SERVICE_ID, breadcrumbSchema, graph, pageMetadata } from '@/
 export const metadata: Metadata = pageMetadata({
     title: 'Contact — start a project',
     description:
-        'Start a project with Abdelkader Ettouzany, web engineer and interface designer in Rabat. Tell me what it is, what’s in the way and when you need it — you’ll get a reply within a day, with what I’d do first.',
+        'Start a project with Abdelkader Ettouzany, web engineer and interface designer in Casablanca. Tell me what it is, what’s in the way and when you need it — you’ll get a reply within a day, with what I’d do first.',
     path: '/contact',
 });
 
@@ -79,14 +80,16 @@ export default function ContactPage() {
                                             data-umami-event-label="Contact page"
                                             className="text-[15px] text-ash transition-colors hover:text-chalk"
                                         >
-                                            Book a 20-minute call
+                                            Book a 30-minute call
                                         </a>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <ContactForm />
+                                <Suspense fallback={<ContactForm />}>
+                                    <QuotedContactForm />
+                                </Suspense>
                             </div>
                         </div>
                     </div>

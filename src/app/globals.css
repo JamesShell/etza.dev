@@ -187,6 +187,69 @@ body {
   }
 }
 
+/* Feedback on the press, not the release. Buttons and chips give a little
+   the instant the pointer goes down — waiting for the click to show anything
+   is what makes an interface feel slow. Use in place of transition-colors /
+   transition-opacity, which would otherwise override the property list. */
+@utility press {
+  transition-property: color, background-color, opacity, scale;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+
+  &:active:not(:disabled) {
+    scale: 0.97;
+    transition-duration: 80ms;
+  }
+}
+
+/* Translucent chrome: content scrolls under it instead of being cut off by an
+   opaque band. Frosted for anyone who has asked for less transparency. */
+@utility glass {
+  background-color: color-mix(in srgb, var(--color-void) 72%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-void);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@utility glass-dark {
+  background-color: color-mix(in srgb, var(--color-chalk) 84%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-chalk);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Sections settle in as they arrive, driven by the scroll itself rather than
+   a timer — scroll back and it plays back. Pure CSS, so where scroll-driven
+   animation isn't supported nothing is hidden: the content is simply there.
+   Finishes within the first 160px of entry, so a long section never sits
+   half-faded while you read it. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-timeline: view();
+      animation-range: entry 0 entry 160px;
+    }
+  }
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

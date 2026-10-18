@@ -33,8 +33,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true });
     }
 
-    const name = clean(payload.name, LIMITS.name);
     const email = clean(payload.email, LIMITS.email);
+    // The pricing estimate asks for an email and nothing else — the name
+    // arrives with the booking. Until then the address stands in for it.
+    const name =
+        clean(payload.name, LIMITS.name) ||
+        (clean(payload.source, 20) === 'estimate' ? email.split('@')[0] : '');
     const message = clean(payload.message, LIMITS.message);
     const company = clean(payload.company, LIMITS.company);
     const location = clean(payload.location, LIMITS.location);

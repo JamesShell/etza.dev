@@ -33,8 +33,17 @@ export const profile = {
         greeting: 'I’m Ettouzany,',
         descriptor: 'a web engineer who designs.',
         support:
-            'Four years across real-estate platforms, early startup products and agency work. Owning both halves means fewer handoffs, and fewer things lost between them.',
+            'I design and build websites, booking and payment systems, and web apps for businesses that have outgrown their current setup. Owning both halves means fewer handoffs, and fewer things lost between them.',
     },
+
+    /**
+     * The proof line directly under the statement. Every item has to be
+     * checkable — no ratings here, they already sit beside the links in the
+     * rail. Only list client locations that are actually true.
+     */
+    proof: [
+        '4 years of client work',
+    ],
 
     /**
      * `rating` puts the score on a pill beside the link. Only set it where the
@@ -56,6 +65,17 @@ export const profile = {
         href: null as string | null,
         label: 'Download CV',
     },
+
+    /**
+     * Footer links. The job-search route comes first so someone hiring for a
+     * role finds it without reading the project pitch above it.
+     */
+    footerLinks: [
+        { label: 'Hiring? See my CV', href: '/cv', external: false },
+        { label: 'Dribbble', href: 'https://dribbble.com/ettza', external: true },
+        { label: 'Contra', href: 'https://contra.com/ettouzany', external: true },
+        { label: 'GitHub', href: 'https://github.com/JamesShell', external: true },
+    ],
 } as const;
 
 /**
@@ -69,25 +89,11 @@ export const profile = {
  * narrow and centred, and long blocks collapse into a wall at that width.
  */
 export const about = {
-    lead: 'Designer, engineer & serial re-doer of my own homepaget.',
+    lead: 'I’m a web engineer who designs, based in Morocco and currently studying Business Administration.',
 
     paragraphs: [
-        'I started out designing, then picked up engineering because I kept wanting control over how things actually behaved — the timing of a transition, the way a layout breaks at an awkward width, what happens on a slow connection. Four years later I do both halves, which mostly means nobody to argue with but myself.',
-        'Most of my work is real-estate platforms, early-stage products and agency overflow. Usually the same story: a business whose site no longer matches what it does, and a small team with no time to fix it. I scope it, design it, build it, and hand over a repo they own.',
-        'Taking on new projects right now, and open to full-time front-end roles too. If you’re building something good, let’s talk.',
-    ],
-
-    /**
-     * The human list. Keep adding real ones — it reads better the more specific
-     * and the less professional it gets, and the off-screen entries are the
-     * ones people actually remember.
-     */
-    listLead: 'Outside of client work, I’m:',
-    list: [
-        'playing chess',
-        'rebuilding this site instead of leaving it alone',
-        'chasing scroll-driven motion that doesn’t drop frames',
-        'teaching a small blinking face to follow your cursor',
+        'I design websites and web apps, then build them myself. Four years of client work have taught me that what makes a site good is mostly in the details — how it feels on a phone, how fast it loads, how easy it is to book or pay — so that’s where I spend my time.',
+        'Outside of design, I love playing chess & reading from time to time — currently *Phantoms in the Brain* by V.S. Ramachandran.',
     ],
 
     signoff: 'To hire me or just say hi — I reply within a day, and I like the emails that start with what you’re stuck on.',
@@ -112,24 +118,160 @@ export const volunteering: {
     detail?: string;
 }[] = [];
 
-/** What he actually does, grouped. No proficiency bars, no percentages. */
+/**
+ * What he builds, named after what the client needs rather than the
+ * discipline behind it. No longer a section on the page — the pricing
+ * estimator covers it — but still the service list in structured data and
+ * llms.txt.
+ */
 export const capabilities = [
     {
-        title: 'Interface design',
-        detail: 'Design systems, type scales, responsive layout, prototypes in Figma.',
+        title: 'Websites',
+        detail: 'A new site or a rebuild, set up for search from the start.',
     },
     {
-        title: 'Front-end engineering',
-        detail: 'React, Next.js, TypeScript, Tailwind, GSAP and Framer Motion.',
+        title: 'Booking and payments',
+        detail: 'Customers book and pay on your site instead of by phone or message.',
     },
     {
-        title: 'Full-stack delivery',
-        detail: 'Laravel and Supabase back-ends, auth, admin tooling, deploys.',
+        title: 'Web apps and internal tools',
+        detail: 'Dashboards and admin tools that replace spreadsheets.',
     },
-    {
-        title: 'Performance & SEO',
-        detail: 'Core Web Vitals, semantic markup, structured data, image budgets.',
+];
+
+/**
+ * The estimator in the Pricing section. All prices in USD — change a number
+ * here and the estimate, the summary and the contact hand-off all follow.
+ *
+ * `weeks` is roughly how much each feature adds to the timeline; the estimate
+ * shows a two-week range on top of the sum, so it can stay rough. A feature
+ * with `max` is counted (pages, integrations) rather than switched on.
+ */
+export type PricingFeature = {
+    id: string;
+    name: string;
+    detail: string;
+    price: number;
+    weeks: number;
+    max?: number;
+};
+
+export type ProjectKind = 'website' | 'webapp';
+
+export const pricing: {
+    types: Record<
+        ProjectKind,
+        {
+            title: string;
+            pitch: string;
+            base: { name: string; detail: string; price: number; weeks: number };
+            groups: { title: string; features: PricingFeature[] }[];
+        }
+    >;
+    plan: { monthly: number; capacity: number };
+    planningSession: number;
+} = {
+    types: {
+        website: {
+            title: 'Website',
+            pitch: 'A business site, with bookings or payments if you need them.',
+            base: {
+                name: 'Website design and build',
+                detail: 'Up to 5 pages you can edit yourself — text, photos, events, menus — designed for phones first, set up for search, with visitor analytics.',
+                price: 1500,
+                weeks: 3,
+            },
+            // Editing your own content is part of every site, so it's in the
+            // base rather than sold back as an extra. These are the things that
+            // genuinely change the size of the job.
+            groups: [
+                {
+                    title: 'Design and content',
+                    features: [
+                        { id: 'pages', name: 'Extra pages', detail: 'Beyond the five included — say, one per service or location.', price: 150, weeks: 0.2, max: 15 },
+                        { id: 'copy', name: 'Words written for you', detail: 'I write the copy for every page, so it reads well and shows up in search.', price: 500, weeks: 0.5 },
+                        { id: 'brand', name: 'Logo and brand basics', detail: 'A simple logo, colours and type, if you don’t have them yet.', price: 600, weeks: 1 },
+                        { id: 'migrate', name: 'Move your old site over', detail: 'Pages and images carried across, with redirects so old links and search rankings survive.', price: 400, weeks: 0.5 },
+                    ],
+                },
+                {
+                    title: 'Bookings and sales',
+                    features: [
+                        { id: 'booking', name: 'Online booking', detail: 'Customers pick a time themselves. Staff schedules and reminders included.', price: 900, weeks: 1 },
+                        { id: 'payments', name: 'Payments and deposits', detail: 'Take card payments at checkout or when someone books.', price: 350, weeks: 0.5 },
+                        { id: 'shop', name: 'Online shop', detail: 'Sell products with stock, shipping options and order emails.', price: 1200, weeks: 1.5 },
+                        { id: 'loyalty', name: 'Customer accounts and rewards', detail: 'Logins, saved details, points and a loyalty program.', price: 900, weeks: 1 },
+                    ],
+                },
+                {
+                    title: 'Get found, reach more people',
+                    features: [
+                        { id: 'local', name: 'Local search setup', detail: 'Google Business Profile and maps listing, so people nearby find you.', price: 250, weeks: 0.2 },
+                        { id: 'blog', name: 'Blog or news', detail: 'Posts that keep the site fresh and bring in search traffic.', price: 300, weeks: 0.5 },
+                        { id: 'lang', name: 'Second language', detail: 'Including Arabic, with right-to-left layouts.', price: 400, weeks: 0.5 },
+                        { id: 'a11y', name: 'Accessibility check', detail: 'Tested so people using screen readers or a keyboard can use it.', price: 350, weeks: 0.5 },
+                        { id: 'ai', name: 'AI assistant', detail: 'Answers common questions and books appointments, day or night.', price: 700, weeks: 1 },
+                    ],
+                },
+            ],
+        },
+        webapp: {
+            title: 'Web app',
+            pitch: 'Accounts, dashboards and internal tools that replace spreadsheets.',
+            base: {
+                name: 'Web app design and build',
+                detail: 'Sign-in, an admin dashboard, a database, and it works on phones.',
+                price: 3500,
+                weeks: 6,
+            },
+            groups: [
+                {
+                    title: 'People and access',
+                    features: [
+                        { id: 'roles', name: 'Access levels', detail: 'Decide who sees and changes what — staff, managers, clients.', price: 600, weeks: 0.5 },
+                        { id: 'pwa', name: 'Installable on phones', detail: 'Opens from the home screen like an app, no app store needed.', price: 500, weeks: 0.5 },
+                        { id: 'lang', name: 'Second language', detail: 'Including Arabic, with right-to-left layouts.', price: 500, weeks: 0.5 },
+                    ],
+                },
+                {
+                    title: 'Running the business',
+                    features: [
+                        { id: 'booking', name: 'Booking and scheduling', detail: 'Availability, reservations and reminders.', price: 900, weeks: 1 },
+                        { id: 'payments', name: 'Payments and subscriptions', detail: 'Checkout, recurring plans and invoices.', price: 900, weeks: 1 },
+                        { id: 'notify', name: 'Email and SMS notifications', detail: 'Confirmations, alerts and reminders, sent automatically.', price: 350, weeks: 0.5 },
+                        { id: 'reports', name: 'Reports', detail: 'Charts and exports from your own data, instead of a spreadsheet.', price: 900, weeks: 1 },
+                    ],
+                },
+                {
+                    title: 'Your data and tools',
+                    features: [
+                        { id: 'import', name: 'Bring in your existing data', detail: 'Spreadsheets or records from the tool you use today, imported and cleaned up.', price: 500, weeks: 0.5 },
+                        { id: 'integr', name: 'Connect a tool you already use', detail: 'Your CRM, calendar or accounting software. Priced per tool.', price: 500, weeks: 0.5, max: 6 },
+                        { id: 'ai', name: 'AI features', detail: 'An assistant, automatic summaries and smarter search.', price: 1000, weeks: 1 },
+                    ],
+                },
+            ],
+        },
     },
+    // `capacity` is how much work, at one-off prices, a month on the plan buys.
+    plan: { monthly: 3000, capacity: 6000 },
+    planningSession: 500,
+};
+
+/** The budget options on the contact form. The estimator picks one of these
+ *  when it hands a quote over, so the strings have to match exactly. */
+export const budgets = ['$2.5–5k', '$5–10k', '$10k+', 'Monthly plan'];
+
+/**
+ * These are real steps in a fixed order, which is the only reason they're
+ * numbered. Keep each one short enough to read at a glance.
+ */
+export const steps = [
+    '30-minute call.',
+    'Fixed price in writing.',
+    'Design, you approve it.',
+    'Build and launch.',
+    'Two weeks of free fixes after launch.',
 ];
 
 export const stack = [
@@ -252,7 +394,7 @@ export const faqs = [
     {
         question: 'What does it cost?',
         answer:
-            'Fixed price per project, quoted against the written scope, invoiced in two or three stages rather than all up front. I quote after the first call and not before it — a number given without knowing the page count, the content situation and whether there is a back end behind it is a guess, and guesses get corrected in the wrong direction later.',
+            'The estimate on the pricing page gives you a starting number. The final price is fixed in writing after the first call, usually within 10% of that estimate, and paid 40% to start, 40% when you approve the design and 20% at launch. If you have steady work, the monthly plan can cost about half.',
     },
     {
         question: 'Do you design, or only build?',
@@ -265,14 +407,29 @@ export const faqs = [
             'Yes — a rebuild, a redesign of a few key pages, or joining an existing codebase and working the way that team already works. I will tell you honestly which of the three your situation calls for, including when the answer is that the site you have is fine and the problem is somewhere else.',
     },
     {
-        question: 'What do I get at handover, and who owns it?',
+        question: 'What do I get at handover?',
         answer:
-            'You do, all of it. The code ships to your repository and your hosting account, with the Figma file, a short walkthrough of how to edit content, and no proprietary builder or licence to keep paying for. Nothing is held hostage — you can hand the whole thing to another developer the week after launch.',
+            'The code in your repository and your hosting account, the Figma file, and a short walkthrough of how to edit content. No proprietary builder and no licence to keep paying for.',
+    },
+    {
+        question: 'Do I own the site?',
+        answer:
+            'Yes, all of it — the code, the design files, the domain and the hosting account are in your name. Nothing is held hostage: you can hand the whole thing to another developer the week after launch.',
     },
     {
         question: 'What happens after launch?',
         answer:
-            'Two weeks of fixes on me for anything that turns out to be broken or wrong against the scope. After that I am available for changes at an hourly rate, or on a small monthly retainer if you would rather have someone on call. Neither is required to keep the site running.',
+            'Two weeks of fixes on me for anything that turns out to be broken or wrong against the scope. After that I am available for changes at an hourly rate, or on the monthly plan if you have steady work. Neither is required to keep the site running — it is yours, on your own hosting.',
+    },
+    {
+        question: 'What happens if I cancel the monthly plan early?',
+        answer:
+            'You can pause or cancel the monthly plan anytime, with no fee to leave. If you leave in the first three months, you keep all the work by paying the difference to the one-off price.',
+    },
+    {
+        question: 'You’re in Morocco, what hours do you work?',
+        answer:
+            'Morocco is on GMT+1, so I’m within an hour of the UK and central Europe all year round, and my afternoons overlap with US mornings.',
     },
     {
         question: 'Are you open to full-time roles?',

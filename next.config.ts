@@ -41,6 +41,10 @@ const nextConfig: NextConfig = {
     return [
       { source: '/contra', destination: '/?ref=contra', permanent: false },
       { source: '/discord', destination: '/?ref=discord', permanent: false },
+      // The contact page is hidden for now: project enquiries go through the
+      // pricing estimate and straight into a booking. The page and its form
+      // still exist — delete this line to bring /contact back.
+      { source: '/contact', destination: '/book', permanent: false },
     ];
   },
 

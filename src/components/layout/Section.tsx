@@ -18,9 +18,11 @@ export function Section({
     className?: string;
 }) {
     return (
-        <section id={id} className={`scroll-mt-8 py-14 md:py-20 ${className}`}>
+        <section id={id} className={`reveal scroll-mt-8 py-14 md:py-20 ${className}`}>
             <div className="mb-8 flex items-baseline justify-between gap-4 md:mb-10">
-                <h2 className="text-[12px] tracking-tight text-dust">{label}</h2>
+                {/* Small text gets a touch of positive tracking, not negative —
+                    tightening only helps type once it's large. */}
+                <h2 className="text-[12px] tracking-[0.01em] text-dust">{label}</h2>
                 {count && (
                     <span className="tabular text-[12px] text-dust">{count}</span>
                 )}

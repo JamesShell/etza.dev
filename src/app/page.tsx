@@ -5,7 +5,7 @@ import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Statement } from '@/components/sections/Statement';
 import { WorkGrid } from '@/components/sections/WorkGrid';
 import { WorkIndex } from '@/components/sections/WorkIndex';
-import { Practice } from '@/components/sections/Practice';
+import { Process } from '@/components/sections/Process';
 import { Working } from '@/components/sections/Working';
 import { Contact } from '@/components/sections/Contact';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -32,7 +32,7 @@ export const revalidate = 60;
 export const metadata: Metadata = pageMetadata({
     title: `${profile.name} — ${profile.role}`,
     description:
-        'Web engineer and interface designer in Rabat, Morocco. I design and build web interfaces end to end — real-estate platforms, startup products and agency work. Taking on new projects, and open to full-time roles.',
+        'I design and build websites, booking and payment systems, and web apps. Instant estimate, fixed price in writing. Based in Casablanca, working worldwide.',
     path: '/',
     absoluteTitle: true,
 });
@@ -115,11 +115,11 @@ export default async function Home() {
                         )}
                     </Section>
 
-                    <Section id="practice" label="What I do">
-                        <Practice />
+                    <Section id="process" label="How it works">
+                        <Process />
                     </Section>
 
-                    <Section id="working" label="Working together">
+                    <Section id="working" label="Questions">
                         <Working />
                     </Section>
 

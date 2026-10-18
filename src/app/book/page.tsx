@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { profile } from '@/content/profile';
 import { PERSON_ID, breadcrumbSchema, graph, pageMetadata } from '@/lib/seo';
-import { BookEmbed } from './BookEmbed';
+import { BookEmbedShell, PrefilledBookEmbed } from './BookEmbed';
 
 export const metadata: Metadata = pageMetadata({
     title: 'Book a call',
     description:
-        'Book a short call with Abdelkader Ettouzany, web engineer and interface designer in Rabat. Bring the problem, not a brief — we’ll work out whether I’m the right person for it.',
+        'Book a 30-minute call with Abdelkader Ettouzany. Bring the problem, not a brief — leave with a rough scope, a price range and a clear next step.',
     path: '/book',
 });
 
@@ -36,7 +37,7 @@ export default function BookPage() {
             <div className="mx-auto max-w-[1240px] px-5 md:px-8">
                 <section className="py-14 md:py-20">
                     <h1 className="max-w-[14ch] font-display text-[clamp(30px,5vw,48px)] font-medium leading-[1.08] tracking-[-0.04em] text-chalk">
-                        Book a 20-minute call
+                        Book a 30-minute call
                     </h1>
                     <p className="mt-6 max-w-[52ch] font-sans text-[16px] leading-relaxed text-ash">
                         Bring the problem, not a brief. We&rsquo;ll work out whether I&rsquo;m the right
@@ -54,7 +55,9 @@ export default function BookPage() {
                         </a>
                     </p>
 
-                    <BookEmbed />
+                    <Suspense fallback={<BookEmbedShell />}>
+                        <PrefilledBookEmbed />
+                    </Suspense>
                 </section>
 
                 <SiteFooter />

@@ -21,9 +21,10 @@ export type RailLink = { label: string; href: string };
  * rather than a page, so it belongs with the outbound links below.
  */
 const PAGES: RailLink[] = [
-    { label: 'Works', href: '/' },
+    { label: 'Work', href: '/' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'About', href: '/about' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Book a call', href: '/book' },
 ];
 
 /**
@@ -78,7 +79,7 @@ export function IdentityRail() {
                                         aria-current={isCurrent ? 'page' : undefined}
                                         onClick={() =>
                                             clickEvent({
-                                                action: `open_${link.href === '/' ? 'work' : link.href.slice(1)}`,
+                                                action: `open_${link.label.toLowerCase().replace(/\s+/g, '_')}`,
                                                 category: 'engagement',
                                                 label: 'Identity rail',
                                             })
