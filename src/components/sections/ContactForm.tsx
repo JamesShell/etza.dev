@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, CalendarBlank, CheckCircle } from '@phosphor-icons/react';
 import { budgets, profile } from '@/content/profile';
-import { clickEvent } from '@/lib/analytics';
+import { attribution, clickEvent } from '@/lib/analytics';
 
 type Errors = Record<string, string>;
 
@@ -67,7 +67,7 @@ export function ContactForm({
             const response = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, kind }),
+                body: JSON.stringify({ ...data, kind, ...attribution() }),
             });
             const body = await response.json().catch(() => ({}));
 

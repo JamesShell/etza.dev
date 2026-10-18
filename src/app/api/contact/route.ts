@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { sendLead, type Lead } from '@/lib/crm';
 import type { MessageInsert } from '@/types/database';
 
 /**
@@ -11,10 +12,26 @@ import type { MessageInsert } from '@/types/database';
  */
 
 const KINDS = ['project', 'role', 'other'];
+const PROJECT_KINDS = ['website', 'webapp'] as const;
 const LIMITS = { name: 120, email: 200, company: 160, location: 120, budget: 60, message: 4000 };
 
 function clean(value: unknown, max: number) {
     return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+/** The CRM's kind is narrower than the form's: an estimate knows whether it's
+ *  a website or a web app, a "project" message from the form doesn't. */
+function leadKind(kind: string, projectKind: string): Lead['kind'] {
+    const known = PROJECT_KINDS.find((k) => k === projectKind);
+    if (known) return known;
+    return kind === 'role' ? 'role' : 'other';
+}
+
+function leadEstimate(value: unknown): Lead['estimate'] {
+    if (!value || typeof value !== 'object') return undefined;
+    const { total, summary } = value as Record<string, unknown>;
+    if (typeof total !== 'number' || !Number.isFinite(total) || total < 0 || total > 1_000_000) return undefined;
+    return { total: Math.round(total), currency: 'USD', summary: clean(summary, 300) };
 }
 
 export async function POST(request: Request) {
@@ -64,10 +81,26 @@ export async function POST(request: Request) {
         budget: budget || null,
     };
 
-    const { error } = await supabase.from('messages').insert(record);
+    // Both at once: the estimate reaches the CRM here, before the visitor has
+    // even seen the calendar, so it counts whether or not they finish booking.
+    const [{ error }, inCrm] = await Promise.all([
+        supabase.from('messages').insert(record),
+        sendLead({
+            name,
+            email,
+            message,
+            company: company || undefined,
+            kind: leadKind(kind, clean(payload.projectKind, 20)),
+            estimate: leadEstimate(payload.estimate),
+            utmSource: clean(payload.utmSource, 120) || undefined,
+            landingPath: clean(payload.landingPath, 300) || undefined,
+        }),
+    ]);
 
     if (error) {
         console.error('contact insert failed', error);
+        // It still reached me through the CRM, so don't tell them it didn't.
+        if (inCrm) return NextResponse.json({ ok: true });
         return NextResponse.json(
             { error: 'That didn’t send. Email me directly and it’ll reach me.' },
             { status: 500 }

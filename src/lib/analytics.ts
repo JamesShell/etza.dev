@@ -26,6 +26,14 @@ export const clickEvent = ({ action, category, label, value }: TrackedEvent) => 
     });
 };
 
+/** Where a lead came from, sent along with the form so the CRM can tell
+ *  campaigns apart. Read from the page the form is on. */
+export const attribution = () => {
+    if (typeof window === 'undefined') return {};
+    const utmSource = new URLSearchParams(window.location.search).get('utm_source');
+    return { landingPath: window.location.pathname, ...(utmSource ? { utmSource } : {}) };
+};
+
 declare global {
     interface Window {
         umami?: {

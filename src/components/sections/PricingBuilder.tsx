@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowDown, ArrowRight, Check, Minus, Plus } from '@phosphor-icons/react';
 import { pricing, type PricingFeature, type ProjectKind } from '@/content/profile';
-import { clickEvent } from '@/lib/analytics';
+import { attribution, clickEvent } from '@/lib/analytics';
 import { PROJECT_KINDS as KINDS, money } from '@/lib/pricing';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -106,6 +106,15 @@ export function PricingBuilder() {
                     email: address,
                     message: summary,
                     budget,
+                    projectKind: kind,
+                    estimate: {
+                        total: onPlan ? planCost : total,
+                        summary: [
+                            ...lines.slice(1).map((line) => line.name),
+                            ...(onPlan ? [`monthly plan, ${months} mo`] : []),
+                        ].join(', ') || type.base.name,
+                    },
+                    ...attribution(),
                     website: new FormData(event.currentTarget).get('website'),
                 }),
             });
