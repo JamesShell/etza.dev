@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from '@phosphor-icons/react/dist/ssr';
-import { SiteNav } from '@/components/layout/SiteNav';
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
+import { BarSpace } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
+import { PageTitle, prose } from '@/components/layout/Page';
 
 /**
  * The root layout declares `index, follow`, and a page that doesn't override it
@@ -14,49 +15,37 @@ export const metadata: Metadata = {
     robots: { index: false, follow: true },
 };
 
+/** Fills the screen like the home page, with the one way out at the bottom. */
 export default function NotFound() {
     return (
-        <main className="flex min-h-screen flex-col">
-            <SiteNav />
+        <main className="flex min-h-svh flex-col">
+            <BarSpace />
 
-            <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-5 md:px-8">
-                <section className="flex flex-1 flex-col justify-center py-24">
-                    <p className="tabular text-[12px] text-dust">404</p>
-
-                    <h1 className="mt-5 max-w-[16ch] font-display text-[clamp(30px,5vw,48px)] font-medium leading-[1.08] tracking-[-0.04em] text-chalk">
-                        This page isn&rsquo;t here.
-                    </h1>
-
-                    <p className="mt-6 max-w-[46ch] font-sans text-[16px] leading-relaxed text-ash">
-                        The link may be broken, or the page may have moved. The work is all still one
-                        click away.
-                    </p>
-
-                    <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
-                        <Link
-                            href="/"
-                            className="group inline-flex items-baseline gap-2 text-[12px] text-ash transition-colors hover:text-chalk"
-                        >
-                            <ArrowLeft
-                                size={14}
-                                aria-hidden="true"
-                                className="self-center transition-transform duration-300 group-hover:-translate-x-1"
-                            />
-                            Home
-                        </Link>
-                        <Link
-                            href="/#work"
-                            className="group inline-flex items-baseline gap-2 text-[12px] text-ash transition-colors hover:text-chalk"
-                        >
-                            Works
-                            <ArrowRight
-                                size={14}
-                                aria-hidden="true"
-                                className="self-center transition-transform duration-300 group-hover:translate-x-1"
-                            />
-                        </Link>
-                    </div>
-                </section>
+            <div className="flex flex-1 flex-col px-5 md:px-8">
+                <div className="flex flex-1 flex-col justify-end">
+                    <PageTitle
+                        eyebrow="404"
+                        title="This page isn’t here."
+                        aside={
+                            <div className="space-y-6">
+                                <p className={prose}>
+                                    The link may be broken, or the page may have moved. The work is all still one click away.
+                                </p>
+                                <Link
+                                    href="/"
+                                    className="group inline-flex items-center gap-2 font-display text-[19px] font-medium tracking-[-0.02em] text-chalk transition-colors hover:text-dust lg:text-[clamp(17px,1.3vw,22px)]"
+                                >
+                                    Back to the work
+                                    <ArrowRight
+                                        size={18}
+                                        aria-hidden="true"
+                                        className="transition-transform duration-300 group-hover:translate-x-1"
+                                    />
+                                </Link>
+                            </div>
+                        }
+                    />
+                </div>
 
                 <SiteFooter />
             </div>

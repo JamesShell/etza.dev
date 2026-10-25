@@ -4,6 +4,10 @@ import Script from 'next/script';
 import './globals.css';
 import CookieBanner from '@/components/layout/CookieBanner';
 import { CursorFace } from '@/components/layout/CursorFace';
+import { SiteHeader } from '@/components/layout/SiteHeader';
+import { SiteLoader } from '@/components/layout/SiteLoader';
+import { LOADED_KEY } from '@/lib/loader';
+import { preconnect } from 'react-dom';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { profile } from '@/content/profile';
 import { SITE_URL, graph, personSchema, websiteSchema } from '@/lib/seo';
@@ -103,14 +107,42 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The work's pictures come from Supabase storage: open that connection
+  // while the page is still arriving, so the covers the home page's loader
+  // waits for start sooner.
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) preconnect(process.env.NEXT_PUBLIC_SUPABASE_URL);
+
   return (
-    <html lang="en" className="scroll-smooth">
+    <html
+      lang="en"
+      className="scroll-smooth"
+      // Tells Next to drop smooth scrolling while it changes route, so a
+      // page arrives at the top instantly — a glide up from the bottom of a
+      // case study would otherwise run under the cover transition.
+      data-scroll-behavior="smooth"
+      // The inline script below may add data-loaded before hydration.
+      suppressHydrationWarning
+    >
       <body className={`${dmSans.variable} antialiased`}>
+        {/* Later in the same session the loader is skipped: this marks <html>
+            before first paint, so CSS hides the loader before it can flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem(${JSON.stringify(LOADED_KEY)}))document.documentElement.dataset.loaded=''}catch(e){}`,
+          }}
+        />
+        {/* Inline rather than in globals.css: Turbopack's CSS step silently
+            dropped this rule there, and the loader would flash on every load. */}
+        <style dangerouslySetInnerHTML={{ __html: 'html[data-loaded] [data-site-loader]{display:none}' }} />
         {/* Who the site is and who runs it, stated once for every route. Pages
             reference these two nodes by @id rather than restating them. */}
         <JsonLd id="schema-site" data={graph(websiteSchema(), personSchema())} />
 
+        {/* The bar lives here rather than in each page, so it persists
+            across navigation; each page holds its space open with BarSpace. */}
+        <SiteHeader />
         {children}
+        <SiteLoader />
         <CursorFace />
         {/* Umami tracks page views by itself, including client-side route
             changes, so there's nothing to wire into the router. */}

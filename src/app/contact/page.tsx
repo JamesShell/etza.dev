@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import { IdentityRail } from '@/components/layout/IdentityRail';
+import Image from 'next/image';
+import { ArrowDownRight } from '@phosphor-icons/react/dist/ssr';
+import { BarSpace } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
-import { ContactForm, QuotedContactForm } from '@/components/sections/ContactForm';
+import { ContactForm } from '@/components/sections/ContactForm';
+import { RiseText } from '@/components/ui/Rise';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { profile } from '@/content/profile';
 import { PERSON_ID, SERVICE_ID, breadcrumbSchema, graph, pageMetadata } from '@/lib/seo';
@@ -10,7 +12,7 @@ import { PERSON_ID, SERVICE_ID, breadcrumbSchema, graph, pageMetadata } from '@/
 export const metadata: Metadata = pageMetadata({
     title: 'Contact — start a project',
     description:
-        'Start a project with Abdelkader Ettouzany, web engineer and interface designer in Casablanca. Tell me what it is, what’s in the way and when you need it — you’ll get a reply within a day, with what I’d do first.',
+        'Start a project with Abdelkader Ettouzany, web engineer and interface designer in Casablanca. Tell me what it is, what it needs and roughly the budget — you’ll get a reply within a day.',
     path: '/contact',
 });
 
@@ -19,7 +21,7 @@ const jsonLd = graph(
         '@type': 'ContactPage',
         name: 'Contact Abdelkader Ettouzany',
         url: 'https://etza.dev/contact',
-        description: 'Start a project, or open a conversation about a role.',
+        description: 'Start a website or web app project.',
         mainEntity: { '@id': PERSON_ID },
         about: { '@id': SERVICE_ID },
     },
@@ -29,75 +31,112 @@ const jsonLd = graph(
     ])
 );
 
+/** Small upper-case chrome, the same voice as the bar. */
+const chrome = 'text-[11px] uppercase leading-[1.45] tracking-[0.06em]';
+
+/**
+ * Starting a project. The layout follows the reference: the invitation set
+ * large with the person beside it and an arrow down to the form, then the
+ * form as numbered questions on rules, with the direct routes in a column of
+ * their own. The type, the grey and the four columns are the home page's —
+ * the details column is the one the bar keeps the local time in.
+ */
 export default function ContactPage() {
+    const socials = profile.links.filter((l) => l.label !== 'Email');
+    const detail = 'text-[16px] leading-[1.6] text-chalk';
+
     return (
-        <main className="min-h-screen">
+        <main>
             <JsonLd id="schema-contact" data={jsonLd} />
+            <BarSpace />
 
-            <div className="flex flex-col lg:flex-row">
-                <header className="px-5 py-10 md:px-8 lg:sticky lg:top-0 lg:h-screen lg:w-[276px] lg:shrink-0 lg:py-12">
-                    <IdentityRail />
-                </header>
+            <div className="px-5 md:px-8">
+                <section className="grid grid-cols-1 gap-x-5 gap-y-10 pb-16 pt-20 md:grid-cols-4 md:pb-28 md:pt-36">
+                    <RiseText
+                        as="h1"
+                        text="Let’s start a project together"
+                        className="max-w-[13ch] font-display text-[clamp(48px,6.6vw,128px)] font-normal leading-[0.94] tracking-[-0.055em] text-chalk md:col-span-3"
+                    />
 
-                <div className="min-w-0 flex-1 px-5 md:px-8 lg:px-10">
-                    {/* Holds the viewport and sits in the middle of it. `min-h`
-                        rather than `h` so a long form on a short screen grows
-                        and scrolls instead of being clipped. */}
-                    <div className="flex min-h-screen items-center py-14 md:py-20">
-                        {/* The claim takes the left column, the form the right.
-                            Below lg they stack, claim first. */}
-                        <div
-                            id="form"
-                            className="mx-auto grid w-full max-w-[1180px] scroll-mt-8 gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-24"
-                        >
-                            {/* Grid items stretch, so this column is as tall as
-                                the form beside it — the claim holds the top and
-                                the direct routes sit on the bottom edge rather
-                                than crowding under the heading. Stacked below
-                                lg there's no height to spread into, so the
-                                margin does the separating instead. */}
-                            <div className="flex flex-col justify-between">
-                                <h1 className="max-w-[13ch] font-display text-[clamp(36px,5.4vw,64px)] font-medium leading-[1.02] tracking-[-0.045em] text-chalk">
-                                    Let&rsquo;s build the thing.
-                                </h1>
+                    {/* The person beside the invitation, and the arrow down to
+                        where you talk to him. */}
+                    <div className="flex items-end gap-8 md:flex-col md:items-start md:justify-center md:gap-14">
+                        <Image
+                            src="/images/avatar.jpg"
+                            alt={profile.name}
+                            width={128}
+                            height={128}
+                            priority
+                            className="h-20 w-20 rounded-full object-cover md:h-28 md:w-28"
+                        />
+                        <ArrowDownRight size={22} aria-hidden="true" className="mb-1 text-chalk md:mb-0" />
+                    </div>
+                </section>
 
-                                <div className="mt-16 lg:mt-0">
-                                    <p className="text-[12px] uppercase tracking-[0.08em] text-dust">
-                                        Or go direct
-                                    </p>
-                                    <div className="mt-3 flex flex-col items-start gap-2">
-                                        <a
-                                            href={`mailto:${profile.email}`}
-                                            data-umami-event="send_email"
-                                            data-umami-event-label="Contact page"
-                                            className="text-[15px] text-chalk underline decoration-edge underline-offset-4 transition-colors hover:decoration-chalk"
-                                        >
-                                            {profile.email}
-                                        </a>
-                                        <a
-                                            href="/book"
-                                            data-umami-event="click_book_call"
-                                            data-umami-event-label="Contact page"
-                                            className="text-[15px] text-ash transition-colors hover:text-chalk"
-                                        >
-                                            Book a 30-minute call
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                <section className="grid grid-cols-1 gap-x-5 gap-y-16 pb-24 md:grid-cols-4 md:pb-40">
+                    <div className="md:col-span-3 lg:col-span-2">
+                        <ContactForm />
+                    </div>
 
-                            <div>
-                                <Suspense fallback={<ContactForm />}>
-                                    <QuotedContactForm />
-                                </Suspense>
-                            </div>
+                    <aside className="space-y-10 md:col-start-4 md:pt-11">
+                        <div>
+                            <h2 className={`${chrome} text-dust`}>Contact details</h2>
+                            <ul className={`mt-3 ${detail}`}>
+                                <li>
+                                    <a
+                                        href={`mailto:${profile.email}`}
+                                        data-umami-event="send_email"
+                                        data-umami-event-label="Contact page"
+                                        className="transition-colors hover:text-dust"
+                                    >
+                                        {profile.email}
+                                    </a>
+                                </li>
+
+                            </ul>
                         </div>
-                    </div>
 
-                    <div className="mx-auto max-w-[1180px]">
-                        <SiteFooter />
-                    </div>
-                </div>
+                        <div>
+                            <h2 className={`${chrome} text-dust`}>Business details</h2>
+                            <ul className={`mt-3 ${detail}`}>
+                                <li>{profile.name}</li>
+                                <li>{profile.location}</li>
+                                <li>Working worldwide, GMT+1</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h2 className={`${chrome} text-dust`}>Socials</h2>
+                            <ul className={`mt-3 ${detail}`}>
+                                {socials.map((link) => {
+                                    const rating = 'rating' in link ? link.rating : null;
+                                    return (
+                                        <li key={link.label}>
+                                            <a
+                                                href={link.href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="transition-colors hover:text-dust"
+                                            >
+                                                {link.label}
+                                                {rating && (
+                                                    <span
+                                                        aria-label={`, rated ${rating} out of 5`}
+                                                        className="tabular ml-2 text-[13px] text-dust"
+                                                    >
+                                                        {rating} ★
+                                                    </span>
+                                                )}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    </aside>
+                </section>
+
+                <SiteFooter />
             </div>
         </main>
     );

@@ -14,6 +14,22 @@ interface EditForm {
     case_study_id: string | null;
     sort_order: number;
     newImageFile: File | null;
+    newCoverFile: File | null;
+    removeCover: boolean;
+    coverFull: boolean;
+}
+
+/** Puts a file in the public `images` bucket and returns its URL, or null after alerting. */
+async function uploadMedia(file: File): Promise<string | null> {
+    const ext = file.name.split('.').pop();
+    const path = `selected-works/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('images').upload(path, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type || (ext === 'mp4' ? 'video/mp4' : 'application/octet-stream')
+    });
+    if (error) { alert('Upload error: ' + error.message); return null; }
+    return supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
 }
 
 export default function SelectedWorksAdmin() {
@@ -30,6 +46,8 @@ export default function SelectedWorksAdmin() {
     const [showForm, setShowForm] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [coverFull, setCoverFull] = useState(false);
     const [newItem, setNewItem] = useState({
         title: '',
         category: '',
@@ -62,16 +80,18 @@ export default function SelectedWorksAdmin() {
         try {
             let image_url = '';
             if (imageFile) {
-                const ext = imageFile.name.split('.').pop();
-                const path = `selected-works/${Date.now()}.${ext}`;
-                const { error } = await supabase.storage.from('images').upload(path, imageFile, {
-                    cacheControl: '3600',
-                    upsert: false,
-                    contentType: imageFile.type || (ext === 'mp4' ? 'video/mp4' : 'application/octet-stream')
-                });
-                if (error) { alert('Upload error: ' + error.message); return; }
-                const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path);
-                image_url = publicUrl;
+                const url = await uploadMedia(imageFile);
+                if (!url) return;
+                image_url = url;
+            }
+
+            // Only sent when there is one, so adding a work still works on a
+            // database that hasn't had selected_works_cover.sql run yet.
+            let cover_bg_url: string | undefined;
+            if (coverFile) {
+                const url = await uploadMedia(coverFile);
+                if (!url) return;
+                cover_bg_url = url;
             }
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,6 +99,8 @@ export default function SelectedWorksAdmin() {
                 ...newItem,
                 case_study_id: newItem.case_study_id || null,
                 image_url,
+                ...(cover_bg_url ? { cover_bg_url } : {}),
+                ...(coverFull ? { cover_full: true } : {}),
             }]);
 
             if (error) { alert('Error: ' + error.message); return; }
@@ -86,6 +108,8 @@ export default function SelectedWorksAdmin() {
             setShowForm(false);
             setNewItem({ title: '', category: '', display_width: 'full', show_hover_overlay: true, case_study_id: '', sort_order: 0 });
             setImageFile(null);
+            setCoverFile(null);
+            setCoverFull(false);
             fetchAll();
         } finally {
             setIsSubmitting(false);
@@ -128,6 +152,9 @@ export default function SelectedWorksAdmin() {
             case_study_id: work.case_study_id,
             sort_order: work.sort_order,
             newImageFile: null,
+            newCoverFile: null,
+            removeCover: false,
+            coverFull: work.cover_full ?? false,
         });
     };
 
@@ -145,16 +172,19 @@ export default function SelectedWorksAdmin() {
 
             // Upload new image if provided
             if (editForm.newImageFile) {
-                const ext = editForm.newImageFile.name.split('.').pop();
-                const path = `selected-works/${Date.now()}.${ext}`;
-                const { error } = await supabase.storage.from('images').upload(path, editForm.newImageFile, {
-                    cacheControl: '3600',
-                    upsert: false,
-                    contentType: editForm.newImageFile.type || (ext === 'mp4' ? 'video/mp4' : 'application/octet-stream')
-                });
-                if (error) { alert('Upload error: ' + error.message); setIsSaving(false); return; }
-                const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path);
-                image_url = publicUrl;
+                const url = await uploadMedia(editForm.newImageFile);
+                if (!url) return;
+                image_url = url;
+            }
+
+            // The cover background is only touched when it changed.
+            let cover_bg_url: string | null | undefined;
+            if (editForm.newCoverFile) {
+                const url = await uploadMedia(editForm.newCoverFile);
+                if (!url) return;
+                cover_bg_url = url;
+            } else if (editForm.removeCover) {
+                cover_bg_url = null;
             }
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,6 +199,15 @@ export default function SelectedWorksAdmin() {
 
             if (image_url) {
                 updateData.image_url = image_url;
+            }
+
+            if (cover_bg_url !== undefined) {
+                updateData.cover_bg_url = cover_bg_url;
+            }
+
+            const current = works.find((w) => w.id === id);
+            if (editForm.coverFull !== (current?.cover_full ?? false)) {
+                updateData.cover_full = editForm.coverFull;
             }
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -260,6 +299,25 @@ export default function SelectedWorksAdmin() {
                         </div>
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-semibold text-zinc-700 mb-2">Cover Background (optional)</label>
+                        <div className="border-2 border-dashed border-zinc-200 rounded-2xl p-6 text-center hover:bg-zinc-50 transition-colors">
+                            <input type="file" id="sw-cover" className="hidden" accept="image/*"
+                                onChange={e => { if (e.target.files?.[0]) setCoverFile(e.target.files[0]); }} />
+                            <label htmlFor="sw-cover" className="cursor-pointer flex flex-col items-center">
+                                <UploadSimple size={28} className="text-zinc-400 mb-2" />
+                                <span className="text-ink font-semibold">{coverFile ? coverFile.name : 'Click to upload'}</span>
+                                <span className="text-zinc-400 text-xs mt-1">A photo for the media to sit on in the middle of the card. Leave empty for plain grey.</span>
+                            </label>
+                        </div>
+                        <label className="mt-3 flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" className="w-5 h-5 rounded border-zinc-300 text-ink focus:ring-ink"
+                                checked={coverFull} onChange={e => setCoverFull(e.target.checked)} />
+                            <span className="text-sm font-semibold text-zinc-700">Full-bleed cover</span>
+                            <span className="text-xs text-zinc-400">Media fills the card — no frame, background ignored</span>
+                        </label>
+                    </div>
+
                     <div className="flex justify-end gap-3">
                         <button type="button" onClick={() => setShowForm(false)} disabled={isSubmitting}
                             className="px-6 py-3 rounded-xl border border-zinc-200 text-zinc-600 font-semibold hover:bg-zinc-50 transition-colors disabled:opacity-50">
@@ -330,6 +388,59 @@ export default function SelectedWorksAdmin() {
                                                     {editForm.newImageFile ? editForm.newImageFile.name : 'Replace media'}
                                                 </label>
                                             </div>
+
+                                            {/* Cover background */}
+                                            {(() => {
+                                                const coverSrc = editForm.newCoverFile
+                                                    ? URL.createObjectURL(editForm.newCoverFile)
+                                                    : editForm.removeCover ? null : work.cover_bg_url;
+                                                return (
+                                                    <div className="mt-4">
+                                                        <p className="text-xs font-semibold text-zinc-500 mb-1">Cover background</p>
+                                                        {coverSrc ? (
+                                                            <img src={coverSrc} alt="" className="w-32 h-24 rounded-xl object-cover border border-zinc-200 mb-2" />
+                                                        ) : (
+                                                            <div className="w-32 h-24 rounded-xl border border-zinc-200 bg-zinc-100 mb-2 flex items-center justify-center text-[11px] text-zinc-400">Plain grey</div>
+                                                        )}
+                                                        <input
+                                                            type="file"
+                                                            id={`edit-cover-${work.id}`}
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={e => {
+                                                                if (e.target.files?.[0]) {
+                                                                    setEditForm({ ...editForm, newCoverFile: e.target.files[0], removeCover: false });
+                                                                }
+                                                            }}
+                                                        />
+                                                        <div className="flex flex-col gap-1">
+                                                            <label htmlFor={`edit-cover-${work.id}`} className="cursor-pointer flex items-center gap-1.5 text-xs text-ink font-semibold hover:underline">
+                                                                <UploadSimple size={14} />
+                                                                {editForm.newCoverFile ? editForm.newCoverFile.name : coverSrc ? 'Replace background' : 'Add background'}
+                                                            </label>
+                                                            {coverSrc && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setEditForm({ ...editForm, newCoverFile: null, removeCover: true })}
+                                                                    className="flex items-center gap-1.5 text-xs text-zinc-500 font-semibold hover:text-red-600 hover:underline"
+                                                                >
+                                                                    <Trash size={14} />
+                                                                    Remove background
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        <label className="mt-3 flex items-center gap-2 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="w-4 h-4 rounded border-zinc-300 text-ink focus:ring-ink"
+                                                                checked={editForm.coverFull}
+                                                                onChange={e => setEditForm({ ...editForm, coverFull: e.target.checked })}
+                                                            />
+                                                            <span className="text-xs font-semibold text-zinc-700">Full-bleed</span>
+                                                        </label>
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
 
                                         {/* Editable fields */}
@@ -415,6 +526,7 @@ export default function SelectedWorksAdmin() {
                                     <p className="font-bold text-ink truncate">{work.title}</p>
                                     <p className="text-xs text-zinc-400">{work.category} • {work.display_width === 'full' ? 'Full Width' : 'Narrow'}
                                         {linkedStudy && <span> • Linked to <strong>{linkedStudy.title}</strong></span>}
+                                        {work.cover_full ? <span> • Full-bleed</span> : work.cover_bg_url && <span> • Photo background</span>}
                                     </p>
                                 </div>
 

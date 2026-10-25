@@ -2,58 +2,138 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { ArrowRight, CalendarBlank, CheckCircle } from '@phosphor-icons/react';
-import { budgets, profile } from '@/content/profile';
+import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
+import { ArrowRight } from '@phosphor-icons/react';
+import { budgets, capabilities } from '@/content/profile';
 import { attribution, clickEvent } from '@/lib/analytics';
 
 type Errors = Record<string, string>;
 
-const KINDS = [
-    { value: 'project', label: 'A project' },
-    { value: 'role', label: 'A role' },
-    { value: 'other', label: 'Something else' },
-];
+/** Small upper-case chrome, the same voice as the bar. */
+const chrome = 'text-[11px] uppercase leading-[1.45] tracking-[0.06em]';
+
+/** The home cards' caption size: what's typed reads like a card's title. */
+const caption = 'font-display text-[19px] font-medium leading-[1.3] tracking-[-0.02em] lg:text-[clamp(17px,1.3vw,22px)]';
+
+const input = `w-full min-w-0 border-0 bg-transparent p-0 ${caption} text-chalk placeholder:text-edge focus:outline-none focus:ring-0`;
+
+const SERVICES = [...capabilities.map((c) => c.title), 'Something else'];
 
 /**
- * Ruled underneath rather than boxed. The rule is the affordance — it says
- * "type here" without putting a filled panel inside a card that is already a
- * filled panel.
+ * One question on a rule, laid out as on the reference: the number in a
+ * gutter of its own, the question, and the answer underneath at the same
+ * size — set in the home cards' caption type, so the form reads like the row
+ * of work it sits below.
  */
-const field =
-    'w-full border-0 border-b border-edge bg-transparent px-0 py-2 font-sans text-[15px] text-chalk transition-colors placeholder:text-dust focus:border-chalk focus:outline-none focus:ring-0';
-
-/**
- * The form as the pricing estimate hands it over: `/contact?quote=…&budget=…`
- * arrives with the message and budget already filled in. The contact page
- * renders the plain form as this one's Suspense fallback, so the static HTML
- * is still a working form before the query string is read.
- */
-export function QuotedContactForm() {
-    const params = useSearchParams();
-    const budget = params.get('budget') ?? '';
-
+function Row({
+    n,
+    label,
+    htmlFor,
+    error,
+    children,
+}: {
+    n: number;
+    label: string;
+    htmlFor?: string;
+    error?: string;
+    children: React.ReactNode;
+}) {
+    const Label = htmlFor ? 'label' : 'p';
     return (
-        <ContactForm
-            initialMessage={params.get('quote')?.slice(0, 2000) ?? ''}
-            initialBudget={budgets.includes(budget) ? budget : ''}
-        />
+        <div className="grid grid-cols-[40px_1fr] border-t border-raise py-8 md:grid-cols-[72px_1fr] md:py-11">
+            <span className={`${chrome} tabular pt-[0.4em] text-dust`}>{String(n).padStart(2, '0')}</span>
+            <div className="min-w-0">
+                <Label {...(htmlFor ? { htmlFor } : {})} className={`block ${caption} text-chalk`}>
+                    {label}
+                </Label>
+                <div className="mt-3">{children}</div>
+                {error && (
+                    <p role="alert" className={`${chrome} mt-3 text-alert`}>
+                        {error}
+                    </p>
+                )}
+            </div>
+        </div>
     );
 }
 
-export function ContactForm({
-    initialMessage = '',
-    initialBudget = '',
-}: {
-    initialMessage?: string;
-    initialBudget?: string;
-}) {
-    const [kind, setKind] = useState('project');
-    const [budget, setBudget] = useState(initialBudget);
+/**
+ * A choice, set the way the bar sets its pages: grey until it's yours, then
+ * black with the same small square in front of it. Several can be picked, so
+ * each keeps a square of its own rather than sharing one that slides.
+ */
+function Choice({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+    return (
+        <button
+            type="button"
+            aria-pressed={on}
+            onClick={onClick}
+            className={`group inline-flex items-center text-left ${caption} transition-colors ${
+                on ? 'text-chalk' : 'text-dust hover:text-chalk'
+            }`}
+        >
+            <span
+                aria-hidden="true"
+                className={`h-[6px] bg-current transition-[width,margin,opacity] duration-300 ease-out ${
+                    on ? 'mr-2.5 w-[6px] opacity-100' : 'mr-0 w-0 opacity-0'
+                }`}
+            />
+            {children}
+        </button>
+    );
+}
+
+/**
+ * The send button, round and sitting on the closing rule as on the reference,
+ * but drawn like the bar's own circle: an outline that fills on hover. It leans
+ * a little toward the pointer while it's near, and stays put for anyone who
+ * has asked for less motion.
+ */
+function SendButton({ sending }: { sending: boolean }) {
+    const reduce = useReducedMotion();
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const sx = useSpring(x, { stiffness: 220, damping: 18, mass: 0.6 });
+    const sy = useSpring(y, { stiffness: 220, damping: 18, mass: 0.6 });
+
+    return (
+        <motion.button
+            type="submit"
+            disabled={sending}
+            onPointerMove={(e) => {
+                if (reduce || e.pointerType !== 'mouse') return;
+                const r = e.currentTarget.getBoundingClientRect();
+                x.set((e.clientX - (r.left + r.width / 2)) * 0.25);
+                y.set((e.clientY - (r.top + r.height / 2)) * 0.25);
+            }}
+            onPointerLeave={() => {
+                x.set(0);
+                y.set(0);
+            }}
+            style={{ x: sx, y: sy }}
+            className={`flex h-32 w-32 shrink-0 items-center justify-center rounded-full border border-chalk bg-void ${caption} text-chalk transition-colors duration-300 hover:bg-chalk hover:text-void disabled:border-edge disabled:text-dust md:h-40 md:w-40`}
+        >
+            {sending ? 'Sending…' : 'Send it'}
+        </motion.button>
+    );
+}
+
+/**
+ * The project form. It asks for what the API and the CRM already take —
+ * name, email, company, budget and a message — plus what's needed, which
+ * travels at the top of the message so it reads in context, and as the CRM's
+ * project kind when it's clear.
+ */
+export function ContactForm() {
+    const [services, setServices] = useState<string[]>([]);
+    const [budget, setBudget] = useState('');
     const [errors, setErrors] = useState<Errors>({});
     const [failure, setFailure] = useState('');
     const [sending, setSending] = useState(false);
-    const [sent, setSent] = useState(false);
+    const [sent, setSent] = useState<string | null>(null);
+
+    const toggle = (s: string) =>
+        setServices((cur) => (cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s]));
 
     async function submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -61,13 +141,29 @@ export function ContactForm({
         setErrors({});
         setFailure('');
 
-        const data = Object.fromEntries(new FormData(event.currentTarget));
+        const data = Object.fromEntries(new FormData(event.currentTarget)) as Record<string, string>;
+        const written = (data.message ?? '').trim();
+        // Checked here as well as on the server: the server sees the message
+        // with the services line in front, which would pass on its own.
+        if (written.length < 10) {
+            setErrors({ message: 'A sentence or two is plenty.' });
+            setSending(false);
+            return;
+        }
+        const message = services.length ? `Looking for: ${services.join(', ')}\n\n${written}` : written;
+
+        // A web app is the larger job, so it wins when both are picked.
+        const projectKind = services.includes('Web apps and internal tools')
+            ? 'webapp'
+            : services.some((s) => s !== 'Something else')
+                ? 'website'
+                : '';
 
         try {
             const response = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, kind, ...attribution() }),
+                body: JSON.stringify({ ...data, message, budget, kind: 'project', projectKind, ...attribution() }),
             });
             const body = await response.json().catch(() => ({}));
 
@@ -77,8 +173,8 @@ export function ContactForm({
                 return;
             }
 
-            clickEvent({ action: 'contact_form_sent', category: 'conversion', label: kind });
-            setSent(true);
+            clickEvent({ action: 'contact_form_sent', category: 'conversion', label: services.join(', ') || 'project' });
+            setSent((data.name ?? '').trim().split(/\s+/)[0] || 'there');
         } catch {
             setFailure('That didn’t send — you may be offline. Email me and it’ll reach me.');
         } finally {
@@ -86,271 +182,98 @@ export function ContactForm({
         }
     }
 
-    /**
-     * The message is already in. A call is the natural next step, so it's
-     * offered here rather than buried — but the work is done either way, which
-     * is why this reads as an invitation and not an unfinished task.
-     */
+    // The message is in; the reply carries the next step from here.
     if (sent) {
         return (
-            <div className="rounded-2xl bg-shell p-8 md:p-10">
-                <CheckCircle size={30} weight="fill" aria-hidden="true" className="text-chalk" />
-
-                <h2 className="mt-4 font-display text-[24px] font-medium tracking-[-0.02em] text-chalk">
-                    Message sent
-                </h2>
-                <p className="mt-3 max-w-[44ch] font-sans text-[15px] leading-relaxed text-ash">
-                    It’s with me — you’ll get a reply within a day. If you’d rather talk it through,
-                    grab a slot now and we’ll skip a round of email.
-                </p>
-
-                <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
-                    <Link
-                        href="/book"
-                        onClick={() =>
-                            clickEvent({
-                                action: 'click_book_call',
-                                category: 'conversion',
-                                label: 'Contact form success',
-                            })
-                        }
-                        className="group inline-flex items-center gap-2 rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void transition-opacity hover:opacity-90"
-                    >
-                        <CalendarBlank size={15} weight="fill" aria-hidden="true" />
-                        Book a 30-minute call
-                        <ArrowRight
-                            size={14}
-                            aria-hidden="true"
-                            className="transition-transform duration-300 group-hover:translate-x-1"
-                        />
-                    </Link>
-
-                    <Link href="/#work" className="text-[14px] text-ash transition-colors hover:text-chalk">
-                        Back to the work
-                    </Link>
-                </div>
+            <div className="border-t border-raise py-12 md:py-16">
+                <p className={`${chrome} text-dust`}>Message received</p>
+                <p className={`mt-3 ${caption} text-chalk`}>Thank you, {sent}. You&rsquo;ll hear back within a day.</p>
+                <Link
+                    href="/"
+                    className={`group mt-1 inline-flex items-center gap-2 ${caption} text-dust transition-colors hover:text-chalk`}
+                >
+                    Back to the work
+                    <ArrowRight size={16} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
             </div>
         );
     }
 
     return (
         <form onSubmit={submit} noValidate>
-            <fieldset className="border-0 p-0">
-                <legend className="text-[12px] uppercase tracking-[0.08em] text-dust">
-                    What’s this about?
-                </legend>
-                <div className="mt-3 flex flex-wrap gap-2">
-                    {KINDS.map((option) => {
-                        const selected = kind === option.value;
-                        return (
-                            <button
-                                key={option.value}
-                                type="button"
-                                aria-pressed={selected}
-                                onClick={() => setKind(option.value)}
-                                className={`cursor-pointer rounded-full px-4 py-2 text-[14px] transition-colors ${
-                                    selected ? 'bg-chalk text-void' : 'bg-shell text-ash hover:text-chalk'
-                                }`}
-                            >
-                                {option.label}
-                            </button>
-                        );
-                    })}
+            <Row n={1} label="What’s your name?" htmlFor="c-name" error={errors.name}>
+                <input id="c-name" name="name" required autoComplete="name" placeholder="Jane Doe *" className={input} />
+            </Row>
+
+            <Row n={2} label="What’s your email?" htmlFor="c-email" error={errors.email}>
+                <input
+                    id="c-email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    placeholder="jane@company.com *"
+                    className={input}
+                />
+            </Row>
+
+            <Row n={3} label="What’s the name of your company?" htmlFor="c-company">
+                <input id="c-company" name="company" autoComplete="organization" placeholder="Company Ltd" className={input} />
+            </Row>
+
+            <Row n={4} label="What do you need?">
+                <div role="group" aria-label="What do you need?" className="flex flex-wrap gap-x-6 gap-y-1">
+                    {SERVICES.map((s) => (
+                        <Choice key={s} on={services.includes(s)} onClick={() => toggle(s)}>
+                            {s}
+                        </Choice>
+                    ))}
                 </div>
-            </fieldset>
+            </Row>
 
-            <div className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2">
-                <Field name="name" label="Name" required error={errors.name}>
-                    <input
-                        id="name"
-                        name="name"
-                        required
-                        aria-required="true"
-                        autoComplete="name"
-                        // An invented name on purpose. This used to be a real
-                        // client's, taken from the testimonials — a past client
-                        // shouldn't turn up as ghost text in a stranger's form.
-                        placeholder="Sara Bennani"
-                        className={field}
-                    />
-                </Field>
-
-                <Field name="email" label="Email" required error={errors.email}>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        aria-required="true"
-                        autoComplete="email"
-                        placeholder="you@company.com"
-                        className={field}
-                    />
-                </Field>
-
-                {/* Row three answers whatever the enquiry is about — what it
-                    costs for a project, where it's based for a role — and
-                    Company sits beside it. "Something else" gets neither: at
-                    that point I don't know enough to ask a useful question. */}
-                {kind === 'project' && (
-                    <fieldset className="border-0 p-0">
-                        <legend className="block text-[12px] uppercase tracking-[0.08em] text-dust">
-                            Rough budget
-                        </legend>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                            {budgets.map((option) => {
-                                const selected = budget === option;
-                                return (
-                                    <button
-                                        key={option}
-                                        type="button"
-                                        aria-pressed={selected}
-                                        // A second click clears it — budget is optional.
-                                        onClick={() => setBudget(selected ? '' : option)}
-                                        className={`cursor-pointer rounded-full px-3 py-1.5 text-[13px] transition-colors ${
-                                            selected ? 'bg-chalk text-void' : 'bg-shell text-ash hover:text-chalk'
-                                        }`}
-                                    >
-                                        {option}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                        <input type="hidden" name="budget" value={budget} />
-                        <p className="mt-2 text-[13px] text-dust">Helps me scope honestly.</p>
-                    </fieldset>
-                )}
-
-                {kind === 'role' && (
-                    <Field name="location" label="Location" hint="Remote, hybrid or on-site — and where.">
-                        <input
-                            id="location"
-                            name="location"
-                            autoComplete="off"
-                            placeholder="e.g. Remote (EU hours)"
-                            className={field}
-                        />
-                    </Field>
-                )}
-
-                {kind !== 'other' && (
-                    <Field name="company" label="Company">
-                        <input
-                            id="company"
-                            name="company"
-                            autoComplete="organization"
-                            placeholder="Optional"
-                            className={field}
-                        />
-                    </Field>
-                )}
-
-                <div className="sm:col-span-2">
-                    <Field
-                        name="message"
-                        label={kind === 'role' ? 'About the role' : 'What are you building?'}
-                        required
-                        hint={
-                            kind === 'role'
-                                ? 'Team, stack and where it’s based is plenty to start.'
-                                : 'What it is, and what’s in the way. A couple of sentences is plenty.'
-                        }
-                        error={errors.message}
-                    >
-                        <textarea
-                            id="message"
-                            name="message"
-                            rows={initialMessage ? initialMessage.split('\n').length + 2 : 5}
-                            defaultValue={initialMessage}
-                            required
-                            aria-required="true"
-                            className={`${field} resize-y`}
-                        />
-                    </Field>
+            <Row n={5} label="What’s your budget?">
+                <div role="group" aria-label="What’s your budget?" className="flex flex-wrap gap-x-6 gap-y-1">
+                    {budgets.map((b) => (
+                        <Choice key={b} on={budget === b} onClick={() => setBudget(budget === b ? '' : b)}>
+                            {b}
+                        </Choice>
+                    ))}
                 </div>
+            </Row>
+
+            <Row n={6} label="Your message" htmlFor="c-message" error={errors.message}>
+                <textarea
+                    id="c-message"
+                    name="message"
+                    required
+                    rows={3}
+                    placeholder="Hi Abdelkader, I need help with … *"
+                    className={`${input} resize-none`}
+                />
+            </Row>
+
+            {/* Hidden from people, irresistible to bots — see the API route. */}
+            <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                <label>
+                    Website
+                    <input name="website" tabIndex={-1} autoComplete="off" />
+                </label>
             </div>
 
-            {/* Not visible, not focusable, not announced. Bots fill it; people can't. */}
-            <input
-                type="text"
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                className="absolute left-[-9999px] h-px w-px opacity-0"
-            />
-
-            {failure && (
-                <p role="alert" className="mt-8 font-sans text-[14px] leading-relaxed text-chalk">
-                    {failure}{' '}
-                    <a href={`mailto:${profile.email}`} className="underline underline-offset-4">
-                        {profile.email}
-                    </a>
-                </p>
-            )}
-
-            <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-                <p className="text-[13px] text-dust">
-                    Fields marked <span className="text-alert">*</span> are required. Replies within a day.
-                </p>
-
-                <button
-                    type="submit"
-                    disabled={sending}
-                    className="group inline-flex cursor-pointer items-center gap-2 rounded-full bg-chalk px-5 py-2.5 text-[14px] font-medium text-void transition-opacity hover:opacity-90 disabled:opacity-50"
-                >
-                    {sending ? 'Sending' : 'Send message'}
-                    {!sending && (
-                        <ArrowRight
-                            size={14}
-                            aria-hidden="true"
-                            className="transition-transform duration-300 group-hover:translate-x-1"
-                        />
-                    )}
-                </button>
+            {/* The closing rule, with the button sitting on it. */}
+            <div className="border-t border-raise">
+                <div className="flex items-center justify-between gap-6 pt-8 md:-mt-20 md:pt-0">
+                    <p
+                        role={failure ? 'alert' : undefined}
+                        className={`${chrome} max-w-[40ch] md:pt-28 ${failure ? 'text-alert' : 'text-dust'}`}
+                    >
+                        {failure || 'Reply within a day'}
+                    </p>
+                    <div className="md:pr-[14%]">
+                        <SendButton sending={sending} />
+                    </div>
+                </div>
             </div>
         </form>
-    );
-}
-
-function Field({
-    name,
-    label,
-    hint,
-    error,
-    required,
-    children,
-}: {
-    name: string;
-    label: string;
-    hint?: string;
-    error?: string;
-    required?: boolean;
-    children: React.ReactNode;
-}) {
-    return (
-        <div>
-            <label
-                htmlFor={name}
-                className="block text-[12px] uppercase tracking-[0.08em] text-dust"
-            >
-                {label}
-                {/* Hidden from screen readers — `required` on the control
-                    already announces it, and "asterisk" read aloud is noise. */}
-                {required && (
-                    <span className="text-alert" aria-hidden="true">
-                        {' '}
-                        *
-                    </span>
-                )}
-            </label>
-            <div className="mt-2">{children}</div>
-            {hint && !error && <p className="mt-2 text-[13px] text-dust">{hint}</p>}
-            {error && (
-                <p role="alert" className="mt-2 text-[13px] text-alert">
-                    {error}
-                </p>
-            )}
-        </div>
     );
 }

@@ -1,7 +1,8 @@
-import { SiteNav } from '@/components/layout/SiteNav';
-import { SiteFooter } from '@/components/layout/SiteFooter';
-import { profile } from '@/content/profile';
 import type { Metadata } from 'next';
+import { BarSpace } from '@/components/layout/SiteHeader';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import { PageSection, PageTitle, prose } from '@/components/layout/Page';
+import { profile } from '@/content/profile';
 import { pageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = pageMetadata({
@@ -32,49 +33,34 @@ const sections = [
 
 export default function PrivacyPage() {
     return (
-        <main className="min-h-screen">
-            <SiteNav />
+        <main>
+            <BarSpace />
 
-            <div className="mx-auto max-w-[1240px] px-5 md:px-8">
-                <section className="py-16 md:py-24">
-                    <h1 className="font-display text-[clamp(30px,5vw,48px)] font-medium tracking-[-0.04em] text-chalk">
-                        Privacy policy
-                    </h1>
-                    <p className="mt-4 text-[12px] text-dust">
-                        Last updated 31 July 2026
+            <div className="px-5 md:px-8">
+                <PageTitle eyebrow="Last updated 31 July 2026" title="Privacy policy" />
+
+                {sections.map((section) => (
+                    <PageSection key={section.heading} label={section.heading}>
+                        <p className={prose}>{section.body}</p>
+                    </PageSection>
+                ))}
+
+                <PageSection label="Contact">
+                    <p className={prose}>
+                        Questions or complaints go to{' '}
+                        <a
+                            href={`mailto:${profile.email}`}
+                            className="text-chalk underline decoration-edge underline-offset-4 transition-colors hover:decoration-chalk"
+                        >
+                            {profile.email}
+                        </a>
+                        .
                     </p>
+                </PageSection>
 
-                    <div className="mt-12 max-w-[68ch] space-y-10">
-                        {sections.map((section) => (
-                            <section key={section.heading}>
-                                <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
-                                    {section.heading}
-                                </h2>
-                                <p className="mt-3 font-sans text-[15px] leading-relaxed text-ash">
-                                    {section.body}
-                                </p>
-                            </section>
-                        ))}
-
-                        <section>
-                            <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-chalk">
-                                Contact
-                            </h2>
-                            <p className="mt-3 font-sans text-[15px] leading-relaxed text-ash">
-                                Questions or complaints go to{' '}
-                                <a
-                                    href={`mailto:${profile.email}`}
-                                    className="text-chalk underline decoration-edge underline-offset-4 transition-colors hover:decoration-chalk"
-                                >
-                                    {profile.email}
-                                </a>
-                                .
-                            </p>
-                        </section>
-                    </div>
-                </section>
-
-                <SiteFooter />
+                <div className="pt-16">
+                    <SiteFooter />
+                </div>
             </div>
         </main>
     );

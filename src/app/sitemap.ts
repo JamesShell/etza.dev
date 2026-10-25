@@ -20,8 +20,8 @@ type Entry = {
  */
 const staticRoutes: Entry[] = [
     { path: '/', changeFrequency: 'weekly', priority: 1 },
-    { path: '/pricing', changeFrequency: 'monthly', priority: 0.9 },
-    { path: '/book', changeFrequency: 'yearly', priority: 0.8 },
+    { path: '/contact', changeFrequency: 'monthly', priority: 0.9 },
+    { path: '/reviews', changeFrequency: 'monthly', priority: 0.7 },
     { path: '/about', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
     { path: '/cookies', changeFrequency: 'yearly', priority: 0.3 },

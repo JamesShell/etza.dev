@@ -131,7 +131,10 @@ html {
 body {
   background-color: var(--color-void);
   color: var(--color-chalk);
-  font-family: var(--font-sans);
+  /* Not var(--font-sans): under `@theme inline` that token only exists inside
+     generated utilities, never as a runtime variable, so the body silently
+     fell back to the system face. --font-dm-sans is set on <body> by next/font. */
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -226,6 +229,34 @@ body {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+}
+
+/* A cover on its way into a case study (src/lib/cover-transition.ts): the
+   rest of the page fades out under it, so it's left alone on screen while the
+   next page loads.
+
+   Kept above .cover-backdrop on purpose: Turbopack's CSS step drops rules
+   that follow that rule's inline SVG data URL, up to the next at-rule —
+   which is how an earlier block here vanished without an error. */
+[data-fade-on-leave] {
+  transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html[data-cover-leaving] [data-fade-on-leave] {
+  opacity: 0;
+}
+
+/* The backdrop behind a work cover: grey that lifts toward the top right, like
+   a lit wall, with a fine grain so the gradient doesn't band on large screens.
+   Built from the page tokens, so it stays inside the achromatic palette. */
+.cover-backdrop {
+  background-color: var(--color-raise);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(120% 95% at 72% 0%,
+      color-mix(in srgb, var(--color-void) 85%, var(--color-shell)) 0%,
+      var(--color-shell) 45%,
+      var(--color-raise) 100%);
 }
 
 /* Sections settle in as they arrive, driven by the scroll itself rather than

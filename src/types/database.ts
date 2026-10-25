@@ -143,6 +143,8 @@ export interface Database {
                     display_width: string
                     show_hover_overlay: boolean
                     sort_order: number
+                    cover_bg_url: string | null
+                    cover_full: boolean
                 }
                 Insert: {
                     id?: string
@@ -154,6 +156,8 @@ export interface Database {
                     display_width?: string
                     show_hover_overlay?: boolean
                     sort_order?: number
+                    cover_bg_url?: string | null
+                    cover_full?: boolean
                 }
                 Update: {
                     id?: string
@@ -165,6 +169,8 @@ export interface Database {
                     display_width?: string
                     show_hover_overlay?: boolean
                     sort_order?: number
+                    cover_bg_url?: string | null
+                    cover_full?: boolean
                 }
                 /**
                  * Required by postgrest-js's `GenericTable`. Without it the

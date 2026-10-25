@@ -1,6 +1,6 @@
 import { about, capabilities, experience, faqs, profile, stack } from '@/content/profile';
-import { pricingQuestions } from '@/lib/pricing';
 import { getCaseStudySlugs } from '@/lib/queries';
+import { getReviews } from '@/lib/reviews';
 import { SITE_URL, absoluteUrl } from '@/lib/seo';
 
 /** Regenerated hourly so a newly published case study shows up here the same
@@ -20,7 +20,7 @@ export const revalidate = 3600;
  * annotated links. It states what is true and lets the pages do the arguing.
  */
 export async function GET() {
-    const studies = await getCaseStudySlugs();
+    const [studies, reviews] = await Promise.all([getCaseStudySlugs(), getReviews()]);
 
     const lines: string[] = [];
 
@@ -44,13 +44,10 @@ export async function GET() {
 
     lines.push('## Pages');
     lines.push('');
-    lines.push(`- [Home](${SITE_URL}): selected work, how a project runs, and the questions clients ask most.`);
-    lines.push(`- [Pricing](${absoluteUrl('/pricing')}): an instant estimate for a website or web app, then a booked call to fix the price.`);
+    lines.push(`- [Home](${SITE_URL}): the selected work, with what each client said about it.`);
     lines.push(`- [About](${absoluteUrl('/about')}): background, how projects run, and what he does outside client work.`);
-    lines.push(`- [Book a call](${absoluteUrl('/book')}): a short introductory call, booked directly.`);
-    if (profile.cv.href) {
-        lines.push(`- [CV](${profile.cv.href}): the full record as a PDF, for hiring conversations.`);
-    }
+    lines.push(`- [Reviews](${absoluteUrl('/reviews')}): what clients say about working with him, in their own words.`);
+    lines.push(`- [Contact](${absoluteUrl('/contact')}): start a project — what it is, what it needs, and roughly the budget.`);
     lines.push('');
 
     if (studies.length > 0) {
@@ -64,23 +61,27 @@ export async function GET() {
         lines.push('');
     }
 
+    // Quoted whole and attributed, so an answer engine can repeat a review
+    // with its source rather than paraphrase it into something nobody said.
+    if (reviews.length > 0) {
+        lines.push('## What clients say');
+        lines.push('');
+        for (const r of reviews) {
+            const who = [r.author, r.detail].filter(Boolean).join(', ');
+            const about = r.project ? ` — on ${r.href ? `[${r.project}](${absoluteUrl(r.href)})` : r.project}` : '';
+            lines.push(`> ${r.quote}`);
+            lines.push(`>`);
+            lines.push(`> — ${who}${about}${r.rating ? ` (${r.rating}/5)` : ''}`);
+            lines.push('');
+        }
+    }
+
     lines.push('## What he does');
     lines.push('');
     for (const capability of capabilities) {
         lines.push(`- **${capability.title}** — ${capability.detail}`);
     }
     lines.push('');
-
-    // Prices in words: answer engines quote sentences, and the estimator on
-    // /pricing is interactive, so this is the version they can read whole.
-    lines.push('## Pricing');
-    lines.push('');
-    for (const item of pricingQuestions()) {
-        lines.push(`### ${item.question}`);
-        lines.push('');
-        lines.push(item.answer.replace('The estimate above', `The estimate at ${absoluteUrl('/pricing')}`));
-        lines.push('');
-    }
 
     lines.push('## Stack');
     lines.push('');

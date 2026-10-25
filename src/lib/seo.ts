@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { capabilities, experience, faqs, pricing, profile, stack } from '@/content/profile';
-import { PROJECT_KINDS, money } from '@/lib/pricing';
+import { capabilities, experience, faqs, profile, stack } from '@/content/profile';
 import type { CaseStudy } from '@/types/database';
 
 /**
@@ -114,10 +113,9 @@ export function websiteSchema() {
 }
 
 /**
- * The service side of the same person. Prices appear only as "from" figures
- * (`priceRange` here, `minPrice` in the catalog below) — the starting prices
- * are fixed and printed on /pricing; the totals are estimates, so no schema
- * claims one.
+ * The service side of the same person. No price is claimed: every project is
+ * priced in writing after the first call, so there's no figure on the site
+ * for a schema to repeat.
  */
 export function professionalServiceSchema() {
     return {
@@ -129,7 +127,6 @@ export function professionalServiceSchema() {
         provider: { '@id': PERSON_ID },
         founder: { '@id': PERSON_ID },
         email: `mailto:${profile.email}`,
-        priceRange: `From ${money(Math.min(...PROJECT_KINDS.map((kind) => pricing.types[kind].base.price)))}`,
         areaServed: [
             { '@type': 'Country', name: 'Morocco' },
             { '@type': 'Place', name: 'Remote — worldwide' },
@@ -155,67 +152,6 @@ export function professionalServiceSchema() {
     };
 }
 
-/**
- * Everything the pricing page sells, as data: each project type with its
- * starting price and its add-ons at list price, plus the monthly plan. Built
- * from the same `pricing` object as the estimator, so the two can't disagree.
- */
-export function pricingSchema() {
-    const types = PROJECT_KINDS.map((kind) => {
-        const type = pricing.types[kind];
-        return {
-            '@type': 'Offer',
-            name: type.base.name,
-            description: type.base.detail,
-            url: absoluteUrl('/pricing'),
-            priceSpecification: {
-                '@type': 'PriceSpecification',
-                minPrice: type.base.price,
-                priceCurrency: 'USD',
-            },
-            itemOffered: {
-                '@type': 'Service',
-                name: type.title,
-                description: type.pitch,
-                provider: { '@id': PERSON_ID },
-            },
-            seller: { '@id': SERVICE_ID },
-            addOn: type.groups
-                .flatMap((group) => group.features)
-                .map((feature) => ({
-                    '@type': 'Offer',
-                    name: feature.name,
-                    description: feature.max ? `${feature.detail} Priced each.` : feature.detail,
-                    price: feature.price,
-                    priceCurrency: 'USD',
-                })),
-        };
-    });
-
-    return {
-        '@type': 'OfferCatalog',
-        '@id': `${SITE_URL}/pricing#catalog`,
-        name: 'Website and web app pricing',
-        url: absoluteUrl('/pricing'),
-        itemListElement: [
-            ...types,
-            {
-                '@type': 'Offer',
-                name: 'Monthly plan',
-                description: `Up to ${money(pricing.plan.capacity)} of work a month at one-off prices. Pause or cancel anytime.`,
-                url: absoluteUrl('/pricing'),
-                priceSpecification: {
-                    '@type': 'UnitPriceSpecification',
-                    price: pricing.plan.monthly,
-                    priceCurrency: 'USD',
-                    unitCode: 'MON',
-                },
-                seller: { '@id': SERVICE_ID },
-            },
-        ],
-    };
-}
-
 /** The questions that already exist on the home page, made retrievable.
  *  Answers are used whole — a truncated answer in schema is a different answer
  *  from the one on the page. */
@@ -229,6 +165,40 @@ export function faqSchema() {
             acceptedAnswer: {
                 '@type': 'Answer',
                 text: faq.answer,
+            },
+        })),
+    };
+}
+
+/**
+ * The reviews page as data: a list of Review nodes, each by a named person,
+ * about the service, linked to the project it concerns. A rating appears only
+ * where the review carried one. Google won't show stars for reviews a business
+ * publishes about itself, so this isn't for rich results — it's so search and
+ * answer engines can read who said what about which project, and quote it.
+ */
+export function reviewsSchema(
+    reviews: { quote: string; author: string; detail: string | null; project: string | null; href: string | null; rating: number | null }[]
+) {
+    return {
+        '@type': 'ItemList',
+        '@id': `${SITE_URL}/reviews#reviews`,
+        name: `Client reviews of ${profile.name}`,
+        numberOfItems: reviews.length,
+        itemListElement: reviews.map((r, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+                '@type': 'Review',
+                author: { '@type': 'Person', name: r.author, ...(r.detail && { description: r.detail }) },
+                reviewBody: r.quote,
+                itemReviewed: { '@id': SERVICE_ID },
+                ...(r.rating && {
+                    reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+                }),
+                ...(r.project && {
+                    about: { '@type': 'CreativeWork', name: r.project, ...(r.href && { url: absoluteUrl(r.href) }) },
+                }),
             },
         })),
     };
@@ -298,8 +268,8 @@ export function graph(...nodes: object[]) {
 export const ROUTE_UPDATED: Record<string, string> = {
     '/': '2026-10-17',
     '/about': '2026-10-17',
-    '/pricing': '2026-10-17',
-    '/book': '2026-10-17',
+    '/contact': '2026-10-25',
+    '/reviews': '2026-10-26',
     '/privacy': '2026-07-31',
     '/cookies': '2026-07-31',
 };

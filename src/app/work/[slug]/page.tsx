@@ -1,16 +1,17 @@
-import { ArrowLeft } from '@phosphor-icons/react/dist/ssr';
-import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { CaseStudyHero } from '@/components/sections/CaseStudyHero';
+import { NextProject } from '@/components/work/NextProject';
+import { Reveal, RiseIn, RiseText } from '@/components/ui/Rise';
+import { Parallax } from '@/components/ui/Parallax';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { notFound } from 'next/navigation';
 import { getCaseStudies, getCaseStudy } from '@/lib/queries';
+import { getWork } from '@/lib/work';
 import { Metadata } from 'next';
 import { RichContentBlock } from '@/types/database';
 import { isVideoUrl } from '@/lib/utils';
 import { breadcrumbSchema, caseStudySchema, graph, pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
-import Link from 'next/link';
 import Markdown from 'react-markdown';
 
 export const revalidate = 60;
@@ -75,38 +76,48 @@ export async function generateMetadata({
     };
 }
 
+/** Small upper-case chrome, the same voice as the bar. */
+const chrome = 'text-[11px] uppercase leading-[1.45] tracking-[0.06em]';
+
+/**
+ * The content blocks, with runs of consecutive paragraphs merged into one, so
+ * a section's text reads as one column instead of a stack of separate cells.
+ */
+function groupBlocks(blocks: RichContentBlock[]) {
+    const out: RichContentBlock[] = [];
+    for (const block of blocks) {
+        const prev = out[out.length - 1];
+        if (block.type === 'text' && prev?.type === 'text') {
+            out[out.length - 1] = { ...prev, value: `${prev.value}\n\n${block.value}` };
+        } else {
+            out.push(block);
+        }
+    }
+    return out;
+}
+
 export default async function CaseStudyPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const study = await getCaseStudy(slug);
+    const [study, work] = await Promise.all([getCaseStudy(slug), getWork()]);
 
     if (!study) {
         notFound();
     }
 
-    const metrics: { label: string; value: React.ReactNode }[] = [
-        { label: 'Discipline', value: study.category },
-    ];
-    if (study.year) metrics.push({ label: 'Year', value: study.year });
-    if (study.timeline) metrics.push({ label: 'Timeline', value: study.timeline });
-    if (study.scope_of_work && study.scope_of_work.length > 0) {
-        metrics.push({
-            label: 'Scope',
-            value: (
-                <span className="flex flex-wrap gap-x-2 gap-y-1">
-                    {study.scope_of_work.map((item, i) => (
-                        <span key={i} className="flex items-center gap-2">
-                            {item}
-                            {i < study.scope_of_work.length - 1 && (
-                                <span className="text-hairline">·</span>
-                            )}
-                        </span>
-                    ))}
-                </span>
-            ),
-        });
-    }
+    // The home row's card for this project, so the hero is the same cover the
+    // visitor clicked on; and the card after it, wrapping round at the end.
+    const href = `/work/${study.slug}`;
+    const index = work.findIndex((w) => w.href === href);
+    const card = index >= 0 ? work[index] : null;
+    const linked = work.filter((w) => w.href);
+    const at = linked.findIndex((w) => w.href === href);
+    const next = linked.length > 1 ? linked[(at + 1) % linked.length] : null;
 
-    const contentBlocks = (study.content as unknown as RichContentBlock[]) || [];
+    const facts = [study.category, [study.year, study.timeline].filter(Boolean).join(' · ')].filter(Boolean);
+    const scope = study.scope_of_work ?? [];
+
+    const blocks = groupBlocks((study.content as unknown as RichContentBlock[]) || []);
+    const overview = study.description.split('\n\n').filter(Boolean);
 
     const jsonLd = graph(
         caseStudySchema(study),
@@ -120,126 +131,166 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
     );
 
     return (
-        <main className="min-h-screen">
+        <main>
             <JsonLd id="schema-case-study" data={jsonLd} />
-            <SiteNav />
 
             <CaseStudyHero
+                href={href}
                 title={study.title}
-                type={study.category}
-                description={study.description}
-                metrics={metrics}
-                heroImage={study.image_url}
+                facts={facts}
+                scope={scope}
+                cover={{
+                    image: card?.image ?? study.image_url,
+                    backdrop: card?.backdrop ?? null,
+                    full: card?.full ?? false,
+                    alt: `${study.title} — ${study.category}`,
+                }}
             />
 
-            <article className="mx-auto max-w-[1240px] px-5 py-20 md:px-8 md:py-28">
-                {/* The hero runs the full 1240; the body sits in the middle of
-                    it at the same 840 as /about, so figures get real width
-                    while the prose inside them stays at a readable measure. */}
-                <div className="mx-auto max-w-[840px]">
-                    {contentBlocks.map((block, index) => {
-                        const prev = index > 0 ? contentBlocks[index - 1] : null;
-                        const spacing = index === 0 ? '' : prev?.type === 'heading' ? 'mt-5' : 'mt-12';
+            {/* Everything below the first screen sits on the same four
+                columns: labels in the first, reading in the middle two,
+                figures across all four. */}
+            <div data-fade-on-leave className="px-5 md:px-8">
+                {overview.length > 0 && (
+                    <section className="grid grid-cols-1 gap-x-5 gap-y-6 py-24 md:grid-cols-4 md:py-40">
+                        <h2 className={`${chrome} text-dust`}>
+                            <RiseIn inView>Overview</RiseIn>
+                        </h2>
+                        <div className="space-y-6 md:col-span-3">
+                            {overview.map((para, i) =>
+                                // The lead paragraph is set large, so it
+                                // arrives the way the page title did.
+                                i === 0 ? (
+                                    <RiseText
+                                        key={i}
+                                        inView
+                                        delay={0}
+                                        text={para}
+                                        className="max-w-[30ch] font-display text-[clamp(26px,2.9vw,48px)] font-normal leading-[1.12] tracking-[-0.035em] text-chalk"
+                                    />
+                                ) : (
+                                    <Reveal key={i} delay={0.1}>
+                                        <p className="max-w-[58ch] text-[17px] leading-[1.6] text-ash">{para}</p>
+                                    </Reveal>
+                                )
+                            )}
+                        </div>
+                    </section>
+                )}
 
-                        return (
-                            <div key={index} className={spacing}>
-                                {block.type === 'heading' &&
-                                    (() => {
-                                        const level = block.level || 2;
-                                        const Tag = `h${level}` as 'h2' | 'h3' | 'h4';
-                                        const size =
-                                            level === 2
-                                                ? 'text-[26px] md:text-[30px]'
-                                                : level === 3
-                                                    ? 'text-[21px] md:text-[23px]'
-                                                    : 'text-[18px]';
-                                        return (
-                                            <Tag
-                                                className={`font-display font-medium tracking-[-0.03em] text-chalk ${size}`}
-                                            >
+                {blocks.length > 0 && (
+                    <article className="grid grid-cols-1 gap-x-5 gap-y-10 md:grid-cols-4 md:gap-y-16">
+                        {blocks.map((block, index) => {
+                            if (block.type === 'heading') {
+                                const level = block.level || 2;
+                                // A section heading labels the first column,
+                                // in the bar's voice; smaller headings stay in
+                                // the reading column, above their text.
+                                if (level === 2) {
+                                    return (
+                                        <h2 key={index} className={`${chrome} pt-2 text-dust md:col-start-1`}>
+                                            <RiseIn inView block>
                                                 {block.value}
-                                            </Tag>
-                                        );
-                                    })()}
-
-                                {block.type === 'text' && (
-                                    <div className="prose prose-invert max-w-[72ch] font-sans text-[17px] leading-relaxed text-ash prose-headings:font-display prose-headings:font-medium prose-headings:tracking-[-0.03em] prose-headings:text-chalk prose-p:text-ash prose-a:text-chalk prose-a:underline-offset-4 prose-strong:text-chalk prose-code:text-chalk prose-li:text-ash">
-                                        {/* The page's h1 is the title in the
-                                            hero. A `#` typed into the admin
-                                            editor would otherwise emit a second
-                                            one inside the article — keep the
-                                            text, drop the tag. */}
-                                        <Markdown disallowedElements={['h1']} unwrapDisallowed>
+                                            </RiseIn>
+                                        </h2>
+                                    );
+                                }
+                                const Tag = `h${level}` as 'h3' | 'h4';
+                                return (
+                                    <Reveal key={index} className="md:col-span-2 md:col-start-2">
+                                        <Tag className="font-display text-[22px] font-medium tracking-[-0.025em] text-chalk">
                                             {block.value}
-                                        </Markdown>
-                                    </div>
-                                )}
+                                        </Tag>
+                                    </Reveal>
+                                );
+                            }
 
-                                {(block.type === 'image' || block.type === 'video') && (
-                                    <figure className="overflow-hidden rounded-2xl bg-shell">
-                                        {isVideoUrl(block.value) || block.type === 'video' ? (
-                                            <video
-                                                src={block.value}
-                                                autoPlay
-                                                muted
-                                                loop
-                                                playsInline
-                                                preload="metadata"
-                                                aria-label={`${study.title} — ${study.category}, figure ${index + 1}`}
-                                                className="block w-full"
-                                            />
-                                        ) : (
-                                            /* Intrinsic size is unknown — the URL
-                                               comes from the database — so the
-                                               figure is sized by width and lets
-                                               the image keep its own ratio. That
-                                               still buys AVIF/WebP and lazy
-                                               loading over a raw <img>. */
-                                            <Image
-                                                src={block.value}
-                                                alt={`${study.title} — ${study.category}, figure ${index + 1}`}
-                                                width={1240}
-                                                height={0}
-                                                sizes="(min-width: 840px) 840px, 100vw"
-                                                className="block h-auto w-full"
-                                            />
-                                        )}
+                            if (block.type === 'text') {
+                                return (
+                                    <Reveal key={index} className="md:col-span-2 md:col-start-2">
+                                        <div
+                                            className="prose max-w-[62ch] text-[17px] leading-[1.6] text-ash prose-headings:font-display prose-headings:font-medium prose-headings:tracking-[-0.025em] prose-headings:text-chalk prose-p:text-ash prose-a:text-chalk prose-a:underline-offset-4 prose-strong:text-chalk prose-code:text-chalk prose-li:text-ash"
+                                        >
+                                            {/* The page's h1 is the title in the
+                                                hero. A `#` typed into the admin
+                                                editor would otherwise emit a second
+                                                one inside the article — keep the
+                                                text, drop the tag. */}
+                                            <Markdown disallowedElements={['h1']} unwrapDisallowed>
+                                                {block.value}
+                                            </Markdown>
+                                        </div>
+                                    </Reveal>
+                                );
+                            }
+
+                            const label = `${study.title} — ${study.category}, figure ${index + 1}`;
+                            return (
+                                <Reveal key={index} kind="media" className="md:col-span-4">
+                                    {/* Drifts against the scroll inside its frame (see Parallax). */}
+                                    <figure className="overflow-hidden bg-shell">
+                                        <Parallax>
+                                            {isVideoUrl(block.value) || block.type === 'video' ? (
+                                                <video
+                                                    src={block.value}
+                                                    autoPlay
+                                                    muted
+                                                    loop
+                                                    playsInline
+                                                    preload="metadata"
+                                                    aria-label={label}
+                                                    className="block w-full"
+                                                />
+                                            ) : (
+                                                /* Intrinsic size is unknown — the URL
+                                                   comes from the database — so the
+                                                   figure is sized by width and lets
+                                                   the image keep its own ratio. */
+                                                <Image
+                                                    src={block.value}
+                                                    alt={label}
+                                                    width={1920}
+                                                    height={0}
+                                                    sizes="100vw"
+                                                    className="block h-auto w-full"
+                                                />
+                                            )}
+                                        </Parallax>
                                     </figure>
-                                )}
-                            </div>
-                        );
-                    })}
+                                </Reveal>
+                            );
+                        })}
+                    </article>
+                )}
 
-                    {study.testimonial_text && (
-                        <figure className="mt-16 pt-10">
-                            <blockquote className="max-w-[52ch] font-display text-[21px] font-medium leading-snug tracking-[-0.02em] text-chalk md:text-[24px]">
-                                &ldquo;{study.testimonial_text}&rdquo;
-                            </blockquote>
-                            <figcaption className="mt-5 text-[12px] text-dust">
-                                {study.testimonial_author}
+                {study.testimonial_text && (
+                    <section className="grid grid-cols-1 gap-x-5 gap-y-6 py-24 md:grid-cols-4 md:py-40">
+                        <h2 className={`${chrome} text-dust`}>
+                            <RiseIn inView>Client</RiseIn>
+                        </h2>
+                        <figure className="md:col-span-3">
+                            <RiseText
+                                as="blockquote"
+                                inView
+                                delay={0}
+                                text={`“${study.testimonial_text}”`}
+                                className="max-w-[26ch] font-display text-[clamp(28px,3.2vw,56px)] font-normal leading-[1.08] tracking-[-0.04em] text-chalk"
+                            />
+                            <figcaption className={`mt-8 ${chrome} text-chalk`}>
+                                <RiseIn inView delay={0.5}>
+                                    {study.testimonial_author}
+                                </RiseIn>
                             </figcaption>
                         </figure>
-                    )}
+                    </section>
+                )}
 
-                    {/* Inside the column, so the way out lines up with the last
-                        line of the read rather than with the page edge. */}
-                    <div className="mt-20 pt-8">
-                        <Link
-                            href="/#work"
-                            className="group inline-flex items-baseline gap-2 text-[12px] text-ash transition-colors hover:text-chalk"
-                        >
-                            <ArrowLeft
-                                size={14}
-                                aria-hidden="true"
-                                className="self-center transition-transform duration-300 group-hover:-translate-x-1"
-                            />
-                            All work
-                        </Link>
-                    </div>
-                </div>
-            </article>
+                {next && next.href !== href && (
+                    <section className="pb-8 pt-24 md:pt-40">
+                        <NextProject item={next} />
+                    </section>
+                )}
 
-            <div className="mx-auto max-w-[1240px] px-5 md:px-8">
                 <SiteFooter />
             </div>
         </main>

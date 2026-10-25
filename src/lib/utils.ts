@@ -12,3 +12,9 @@ export function isVideoUrl(url: string): boolean {
   const lower = url.toLowerCase().split('?')[0];
   return VIDEO_EXTENSIONS.some(ext => lower.endsWith(ext));
 }
+
+/** A PNG is treated as a cut-out: it may carry its own transparency. */
+export function isPngUrl(url: string): boolean {
+  if (!url) return false;
+  return url.toLowerCase().split('?')[0].endsWith('.png');
+}

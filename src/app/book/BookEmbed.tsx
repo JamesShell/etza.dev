@@ -6,12 +6,12 @@ import { useSearchParams } from 'next/navigation';
 import { CheckCircle } from '@phosphor-icons/react';
 import { clickEvent } from '@/lib/analytics';
 
-const shell = 'mt-12 overflow-hidden rounded-2xl bg-shell p-2 md:p-4';
+const shell = 'overflow-hidden bg-shell p-2 md:p-4';
 
 /**
- * The embed as the pricing estimate hands it over: `/book?email=…&notes=…`
- * prefills the booking form, so the visitor isn't asked for the same email
- * twice and the estimate lands in the booking itself.
+ * The embed with its form prefilled from the query string: `/book?email=…&notes=…`
+ * means a visitor who has already written in isn't asked for the same email
+ * twice, and what they wrote lands in the booking itself.
  */
 export function PrefilledBookEmbed() {
     const params = useSearchParams();
@@ -21,9 +21,9 @@ export function PrefilledBookEmbed() {
     return (
         <>
             {notes && (
-                <p className="mt-8 flex items-center gap-2 text-[14px] text-chalk">
+                <p className="mb-6 flex items-center gap-2 text-[14px] text-chalk">
                     <CheckCircle size={18} weight="fill" aria-hidden="true" />
-                    Your estimate is saved and already in the booking notes. Pick a time that works.
+                    Your notes are already in the booking. Pick a time that works.
                 </p>
             )}
             <BookEmbed email={email} notes={notes} />
