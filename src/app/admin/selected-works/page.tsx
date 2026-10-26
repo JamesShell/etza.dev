@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, UPLOAD_CACHE } from '@/lib/supabase';
 import { CaseStudy, SelectedWork } from '@/types/database';
 import { isVideoUrl } from '@/lib/utils';
 import { Plus, Trash, UploadSimple, Eye, EyeSlash, ArrowsVertical, Pencil, FloppyDisk } from '@phosphor-icons/react';
@@ -24,7 +24,7 @@ async function uploadMedia(file: File): Promise<string | null> {
     const ext = file.name.split('.').pop();
     const path = `selected-works/${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from('images').upload(path, file, {
-        cacheControl: '3600',
+        cacheControl: UPLOAD_CACHE,
         upsert: false,
         contentType: file.type || (ext === 'mp4' ? 'video/mp4' : 'application/octet-stream')
     });

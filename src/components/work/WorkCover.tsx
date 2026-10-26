@@ -9,7 +9,18 @@ import { isPngUrl, isVideoUrl } from '@/lib/utils';
  * several times over, and a dozen hidden videos decoding at once is what makes
  * a carousel stutter.
  */
-function CoverVideo({ src, className, label }: { src: string; className: string; label?: string }) {
+function CoverVideo({
+    src,
+    className,
+    label,
+    priority,
+}: {
+    src: string;
+    className: string;
+    label?: string;
+    /** On the first screen: fetch it whole straight away, as a priority image is. */
+    priority: boolean;
+}) {
     const ref = React.useRef<HTMLVideoElement>(null);
 
     React.useEffect(() => {
@@ -30,7 +41,7 @@ function CoverVideo({ src, className, label }: { src: string; className: string;
             muted
             loop
             playsInline
-            preload="metadata"
+            preload={priority ? 'auto' : 'metadata'}
             aria-label={label}
             className={className}
         />
@@ -108,7 +119,7 @@ export function WorkCover({
             {full ? (
                 <div className="relative h-full w-full transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]">
                     {video ? (
-                        <CoverVideo src={image} label={alt} className="h-full w-full object-cover" />
+                        <CoverVideo src={image} label={alt} priority={priority} className="h-full w-full object-cover" />
                     ) : (
                         <Image src={image} alt={alt} fill priority={priority} sizes={sizes} className="object-cover" />
                     )}
@@ -116,7 +127,7 @@ export function WorkCover({
             ) : (
                 <div className="relative flex h-[84%] w-[84%] items-center justify-center transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]">
                     {video ? (
-                        <CoverVideo src={image} label={alt} className={screen} />
+                        <CoverVideo src={image} label={alt} priority={priority} className={screen} />
                     ) : (
                         <Image
                             src={image}

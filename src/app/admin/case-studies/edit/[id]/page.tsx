@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { supabase, UPLOAD_CACHE } from '@/lib/supabase';
 import { CaseStudy, RichContentBlock } from '@/types/database';
 import { UploadSimple, CaretLeft, Trash, TextH, TextT, Image as ImageIcon, ArrowUp, ArrowDown, Spinner, VideoCamera, TextB, TextItalic, LinkSimple, ListBullets, ListNumbers, Quotes } from '@phosphor-icons/react';
 import Link from 'next/link';
@@ -163,7 +163,7 @@ export default function EditCaseStudy() {
                 const filePath = `case-studies/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage.from('images').upload(filePath, imageFile, {
-                    cacheControl: '3600',
+                    cacheControl: UPLOAD_CACHE,
                     upsert: false,
                     contentType: imageFile.type || (fileExt === 'mp4' ? 'video/mp4' : 'application/octet-stream')
                 });
@@ -179,7 +179,7 @@ export default function EditCaseStudy() {
                 const logoExt = logoFile.name.split('.').pop();
                 const logoPath = `case-studies/${Date.now()}-logo.${logoExt}`;
                 const { error: logoErr } = await supabase.storage.from('images').upload(logoPath, logoFile, {
-                    cacheControl: '3600',
+                    cacheControl: UPLOAD_CACHE,
                     upsert: false,
                     contentType: logoFile.type || (logoExt === 'mp4' ? 'video/mp4' : 'application/octet-stream')
                 });
@@ -198,7 +198,7 @@ export default function EditCaseStudy() {
                     const path = `case-studies/${Date.now()}-block-${i}.${ext}`;
 
                     const { error: err } = await supabase.storage.from('images').upload(path, file, {
-                        cacheControl: '3600',
+                        cacheControl: UPLOAD_CACHE,
                         upsert: false,
                         contentType: file.type || (ext === 'mp4' ? 'video/mp4' : 'application/octet-stream')
                     });
@@ -212,7 +212,7 @@ export default function EditCaseStudy() {
                     const path = `case-studies/${Date.now()}-block-${i}.${ext}`;
 
                     const { error: err } = await supabase.storage.from('images').upload(path, file, {
-                        cacheControl: '3600',
+                        cacheControl: UPLOAD_CACHE,
                         upsert: false,
                         contentType: file.type || (ext === 'mp4' ? 'video/mp4' : 'application/octet-stream')
                     });
