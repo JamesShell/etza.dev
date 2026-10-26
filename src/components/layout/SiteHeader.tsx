@@ -239,6 +239,8 @@ function MenuPanel({ onClose }: { onClose: () => void }) {
     return (
         <motion.div
             id="site-menu"
+            // Scrolls natively, under its own overflow (see SmoothScroll).
+            data-lenis-prevent
             role="dialog"
             aria-modal="true"
             aria-label="Menu"

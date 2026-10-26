@@ -128,6 +128,20 @@ html {
   color-scheme: light;
 }
 
+/* Smooth scrolling (src/components/layout/SmoothScroll.tsx). Written out here
+   rather than importing lenis.css, which turns off pointer events on every
+   iframe while smoothing is on at all — that would leave the booking embed
+   dead to clicks. Here frames only ignore the pointer mid-glide, so one
+   passing under the cursor can't swallow the wheel and stop the page short. */
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* A panel that scrolls on its own keeps its scroll to itself at the ends. */
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
 body {
   background-color: var(--color-void);
   color: var(--color-chalk);

@@ -146,6 +146,7 @@ export function ReviewsBoard({ reviews }: { reviews: Review[] }) {
             <div
                 ref={row}
                 onScroll={onScroll}
+                data-lenis-prevent-horizontal
                 role="region"
                 aria-label="Client reviews"
                 tabIndex={0}

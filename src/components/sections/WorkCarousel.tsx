@@ -653,6 +653,7 @@ export function WorkCarousel({
                         onPointerUp={onPointerUp}
                         onPointerCancel={onPointerUp}
                         onClickCapture={onClickCapture}
+                        data-lenis-prevent-horizontal
                         className="hide-scrollbar snap-x snap-mandatory overflow-x-auto scroll-px-5 md:scroll-px-8 lg:snap-none lg:touch-pan-y lg:overflow-hidden lg:select-none"
                     >
                         <motion.ul

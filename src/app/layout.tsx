@@ -6,6 +6,7 @@ import CookieBanner from '@/components/layout/CookieBanner';
 import { CursorFace } from '@/components/layout/CursorFace';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteLoader } from '@/components/layout/SiteLoader';
+import { SmoothScroll } from '@/components/layout/SmoothScroll';
 import { LOADED_KEY } from '@/lib/loader';
 import { preconnect } from 'react-dom';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -143,6 +144,7 @@ export default function RootLayout({
         <SiteHeader />
         {children}
         <SiteLoader />
+        <SmoothScroll />
         <CursorFace />
         {/* Umami tracks page views by itself, including client-side route
             changes, so there's nothing to wire into the router. */}
